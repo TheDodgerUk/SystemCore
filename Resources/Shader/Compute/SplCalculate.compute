@@ -1,0 +1,117 @@
+﻿#pragma kernel calculate_plane
+#pragma kernel calculate_mesh
+#include "SplInclude.compute"
+#define THREAD_GROUPS 8
+
+// inputs
+StructuredBuffer<SplTransducer> Transducers;
+StructuredBuffer<SplSource> Sources;
+uint SourceCount;
+
+Texture2DArray<float3> Balloon;
+SamplerState samplerBalloon;
+
+float AirAbsorption;
+float Frequency;
+
+float4x4 WorldMatrix;
+
+// plane input
+float2 PixelsPerMetre;
+float2 AreaSize;
+
+// mesh input
+Texture2D<float3> PositionMap;
+SamplerState samplerPositionMap;
+float3 MinVertex;
+float3 MaxVertex;
+
+// output
+int OutputDepth;
+float2 OutputSize;
+RWTexture3D<float3> Output;
+
+float3 get_balloon_uv(float3 dir, float d, float4x4 rotation, int depth)
+{
+    // undo source orientation
+    dir = mul(float4(dir, 0), rotation).xyz;
+
+    // compute phi and theta based on direction
+    float theta = acos(dir.z / d);
+    float phi = atan2(dir.y, -dir.x);
+    
+    // convert to [0..1] uvs
+    return float3(inverse_lerp(-PI, PI, phi), saturate(theta / PI), depth);
+}
+
+void calculate_spl(int3 id, float4 receiver)
+{
+    float3 r = mul(receiver, WorldMatrix).xyz;
+    float w = TAU * Frequency;
+    float2 complex = float2(0, 0);
+    for (uint i = 0; i < SourceCount; ++i)
+    {
+        // grab data sets
+        SplSource s = Sources[i];
+        SplTransducer t = Transducers[s.Transducer];
+
+        // compute direction + distance
+        float3 dir = (r - s.Position);
+        float d = length(dir);
+
+        // get directivity data
+        float3 balloonUv = get_balloon_uv(dir, d, s.Rotation, s.Transducer);
+        float3 col = Balloon.SampleLevel(samplerBalloon, balloonUv, 0);
+        float2 balloonData = read_colour(float4(col, 1), t.Sensitivity);
+
+        // compute complex distance
+        float2 c = c_exp_imaginary((w * d) / 343.0) / max(d, EPSILON);
+
+		// compute + apply air absorption 
+        float magnitude = pow(10, (-AirAbsorption * d) / 20.0);
+        c = c_mul(c, complex_from_polar_2(magnitude, 0));
+
+		// apply equaliser
+        c = c_mul(c, s.Equaliser);
+
+		// apply balloon data
+        c = c_mul(c, balloonData);
+
+		// add to the total
+        complex = c_add(complex, c);
+    }
+
+    // write to output texture
+    id.z = OutputDepth;
+    Output[id] = write_colour(complex).xyz;
+}
+
+float4 plane_receiver(int2 id)
+{
+    float2 p = ((id + 0.5) * PixelsPerMetre) - (AreaSize * 0.5f);
+    return float4(-p.x, 0.0, -p.y, 1.0);
+}
+
+float4 mesh_receiver(int2 id)
+{
+    float2 uv = float2(0, 0);
+    uv.x = inverse_lerp(0, OutputSize.x, id.x + 0.5);
+    uv.y = inverse_lerp(0, OutputSize.y, id.y + 0.5);
+
+    float3 c = PositionMap.SampleLevel(samplerPositionMap, uv, 0);
+    c = lerp(MinVertex, MaxVertex, c);
+	c.x *= -1.0;
+    return float4(c.xyz, 1.0);
+}
+
+[numthreads(THREAD_GROUPS, THREAD_GROUPS, 1)]
+void calculate_plane(uint3 id : SV_DispatchThreadID)
+{
+    calculate_spl(id, plane_receiver(id.xy));
+}
+
+[numthreads(THREAD_GROUPS, THREAD_GROUPS, 1)]
+void calculate_mesh(uint3 id : SV_DispatchThreadID)
+{
+    calculate_spl(id, mesh_receiver(id.xy));
+}
