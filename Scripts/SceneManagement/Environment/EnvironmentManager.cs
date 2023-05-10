@@ -764,6 +764,12 @@ public class EnvironmentManager /*: MonoBehaviour*/
 
     private void VFXReplace(Scene chunk)
     {
+        if(SceneDataManager.Instance.VFXReplaceInSceneLoaded == null)
+        {
+            Debug.LogError("SceneDataManager.Instance.VFXReplaceInSceneLoaded == null");
+            return;
+        }
+
         var itemsToAddJson = SceneDataManager.Instance.VFXReplaceInSceneLoaded.FindAll(e => chunk.name.EndsWith(e.Scene));
         foreach (var item in itemsToAddJson)
         {
