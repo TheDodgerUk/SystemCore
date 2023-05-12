@@ -631,7 +631,6 @@ public class EnvironmentManager /*: MonoBehaviour*/
                     {
                         // if there is a process for the object, invoke and wait a frame
 
-#if VR_INTERACTION
                         var cam = root.GetComponent<Camera>();
                         if(cam != null)
                         {
@@ -639,7 +638,7 @@ public class EnvironmentManager /*: MonoBehaviour*/
                             DebugBeep.LogError($"Has a camera when should not", DebugBeep.MessageLevel.High);
 
                         }
-#endif
+
                         if (root != null)
                         {
                             var processor = GetEnvironmentProcessor(chunk, root, chunkType);
