@@ -409,6 +409,7 @@ public class SaveableScene : MonoBehaviour
             var vr = item.GetComponent<VrInteraction>();
             vr.ForceCreateGuid();
 
+#if VR_INTERACTION
             if (vr is VrInteractionPickUp)
             {
                 VrInteractionPickUp pick = (VrInteractionPickUp)vr;
@@ -428,11 +429,12 @@ public class SaveableScene : MonoBehaviour
                     Core.Mono.WaitFor(syncTime, () => { pick.Release(); });
                 });
             }
+#endif
             callback?.Invoke(item);
         });
 
 #else
-        SpawnObject(catalogueId, callback);
+            SpawnObject(catalogueId, callback);
 #endif
     }
 

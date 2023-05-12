@@ -127,9 +127,12 @@ public class VrInteractionPickUpSocket : VrInteractionPickUp
             m_MetaData.m_GameObjectPickUpRigidbody.useGravity = true;
             m_MetaData.m_GameObjectPickUpRigidbody.isKinematic = false;
             m_MetaData.m_GameObjectPickUpRigidbody.AddForce(m_MetaData.m_GameObjectPickup.transform.forward * 5, ForceMode.Force);
+
+#if VR_INTERACTION
             var pickUp = m_MetaData.m_GameObjectPickUpRigidbody.GetComponent<VrInteractionPickUp>();
             pickUp.Grab();
             Core.Mono.WaitFor(2, () => { pickUp.Release(); });
+#endif
         }
     }
 

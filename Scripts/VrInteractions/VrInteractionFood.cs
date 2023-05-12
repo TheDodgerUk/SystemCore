@@ -71,7 +71,7 @@ public class VrInteractionFood : VrInteractionPickUp
             TurnOnNewPart();
         });
 
-
+#if VR_INTERACTION
         // loop though all parts and only allow the one that stays the longest, to be able to grab
         // not the last one
         for (int i = 0; i < m_Data.m_FoodParts.Count-1; i++)
@@ -81,6 +81,7 @@ public class VrInteractionFood : VrInteractionPickUp
                 GrabbableRef.heldIgnoreColliders.Add(collider);
             }  
         }
+#endif
 
     }
 

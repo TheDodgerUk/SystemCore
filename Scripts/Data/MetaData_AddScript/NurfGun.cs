@@ -131,18 +131,21 @@ public class NurfGun : MonoBehaviour
             ammo.m_RealBullet.isKinematic = false;
             ammo.m_RealBullet.AddForce(m_GunBarrel.forward * m_BulletForce, ForceMode.Impulse);
 
-            var pickup = ammo.m_RealBullet.GetComponent<VrInteractionPickUp>();
-            pickup.ForceSync();
-
             if (m_ShootSound)
             {
                 AudioSource.PlayClipAtPoint(m_ShootSound, m_GunBarrel.transform.position, m_ShootVolume);
             }
+
+#if VR_INTERACTION
+            var pickup = ammo.m_RealBullet.GetComponent<VrInteractionPickUp>();
+            pickup.ForceSync();
+
             var heldItem = CameraControllerVR.Instance.HandsRef.Find(e => e.holdingObj != null);
             if (heldItem != null)
             {
                 m_Rigidbody.AddForce(m_GunBarrel.transform.up * m_RecoilPower * 5, ForceMode.Impulse);
             }
+#endif
         }
     }
 }

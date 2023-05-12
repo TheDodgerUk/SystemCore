@@ -138,7 +138,7 @@ public class VrInteractionPickUp : VrInteraction
 
 
         }
-#endif
+
         m_Rigidbody.useGravity = false;
         m_Rigidbody.isKinematic = true;
 
@@ -147,6 +147,7 @@ public class VrInteractionPickUp : VrInteraction
 
         GrabbableRef.onRelease = new UnityHandGrabEvent();
         GrabbableRef.onRelease.AddListener(Release);
+#endif
 #if Photon
         Core.PhotonGenericRef.CollectGenericVrInterationMessage<PickupMessage>(this, (pickupMessage) =>
         {
@@ -155,7 +156,7 @@ public class VrInteractionPickUp : VrInteraction
 #endif
     }
 
-#if Photon
+#if Photon &&  VR_INTERACTION
     [EditorButton]
     private void DEBUG_GRABBED() => Grabbed(CameraControllerVR.Instance.HandRightRef, null);
 
@@ -287,10 +288,12 @@ public class VrInteractionPickUp : VrInteraction
         SetPhysicsToLocalControl();
         if (m_Rigidbody.isKinematic == false)
         {
+#if VR_INTERACTION
             GrabbableRef.body.velocity = message.velocity;
             GrabbableRef.body.angularVelocity = message.angularVelocity;
             GrabbableRef.body.position = message.Position;
             GrabbableRef.body.rotation = message.Rotation;
+#endif
         }
     }
 

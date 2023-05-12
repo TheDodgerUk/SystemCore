@@ -213,16 +213,17 @@ public class PhotonMultiplayerMono : MonoBehaviourPunCallbacks
 
     public void SetNetworkType(NetworkType networkType) => m_NetworkType = networkType;
 
-
+#if VR_INTERACTION
     private NetworkPlayerGloves m_OwnerNetworkPlayer;
     private NetworkPlayerAvatar m_OwnerNetworkPlayerAvatar;
-
+#endif
     public PhotonView m_PhotonViewOwner;
     private InputSystem m_InputSystem;
 
     public void OwnersAvatarSendData(bool enable)
     {
         bool isDone = false;
+#if VR_INTERACTION
         if (m_OwnerNetworkPlayer != null)
         {
             isDone = true;
@@ -239,6 +240,7 @@ public class PhotonMultiplayerMono : MonoBehaviourPunCallbacks
         {
             Debug.LogError($"OwnersAvatarSendData cannot find the correct script");
         }
+#endif
     }
 
 
@@ -372,7 +374,7 @@ public class PhotonMultiplayerMono : MonoBehaviourPunCallbacks
             item.isKinematic = true;
             item.transform.ClearLocals();
         }
-#endif
+
         var view = created.GetComponent<PhotonView>();
         if (view != null)
         {
@@ -424,6 +426,7 @@ public class PhotonMultiplayerMono : MonoBehaviourPunCallbacks
             var render = m_OwnerNetworkPlayer.gameObject.SearchComponent<Renderer>("Sphere");
             render.material.color = newColour;
         }
+#endif
     }
 
 

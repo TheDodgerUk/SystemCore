@@ -53,6 +53,7 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
 
     private bool m_IsFirstTime = true;
 
+    public bool IsFirstTime() => m_IsFirstTime;
     protected override void Awake()
     {
         base.Awake();
@@ -223,7 +224,10 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
             CameraControllerVR.Instance.ToggleBlink(false, () =>
             {
                 Core.PhotonMultiplayerRef.OwnersAvatarSendData(true);
-                SceneManager.SetActiveScene(targetScene);
+                if (targetScene != null)
+                {
+                    SceneManager.SetActiveScene(targetScene);
+                }
                 onFinish?.Invoke();
                 TeleportFirstTime();
             });

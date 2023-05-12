@@ -353,7 +353,16 @@ public class EnvironmentManager /*: MonoBehaviour*/
                     OVRManager.SetSpaceWarp(true);
                     Debug.LogError($"SetSpaceWarp {OVRManager.GetSpaceWarp()}");
 #endif
-                    OnEnvironmentLoadingComplete?.Invoke();                                    
+                    OnEnvironmentLoadingComplete?.Invoke();
+                    Core.Mono.WaitFor(5, () =>
+                    {
+                        if(CameraControllerVR.Instance.IsFirstTime() == true)
+                        {
+                            DebugBeep.LogError("Fail safe TeleportAvatar", DebugBeep.MessageLevel.High);
+                            CameraControllerVR.Instance.TeleportAvatar(Core.Mono.gameObject.scene, Vector3.zero, null);
+                        }
+
+                    });
                 });
 
 #else
@@ -622,11 +631,27 @@ public class EnvironmentManager /*: MonoBehaviour*/
                     {
                         // if there is a process for the object, invoke and wait a frame
 
-                        var processor = GetEnvironmentProcessor(chunk, root, chunkType);
-                        if (processor != null)
+#if VR_INTERACTION
+                        var cam = root.GetComponent<Camera>();
+                        if(cam != null)
                         {
-                            processor.Invoke(chunk, root, chunkType);
-                            Core.Mono.WaitForFrame(rootTick);
+                            root.SetActive(false);
+                            DebugBeep.LogError($"Has a camera when should not", DebugBeep.MessageLevel.High);
+
+                        }
+#endif
+                        if (root != null)
+                        {
+                            var processor = GetEnvironmentProcessor(chunk, root, chunkType);
+                            if (processor != null)
+                            {
+                                processor.Invoke(chunk, root, chunkType);
+                                Core.Mono.WaitForFrame(rootTick);
+                            }
+                            else
+                            {
+                                rootTick();
+                            }
                         }
                         else
                         {

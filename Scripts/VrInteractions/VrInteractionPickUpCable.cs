@@ -25,8 +25,10 @@ public class VrInteractionPickUpCable : VrInteractionPickUpSocket
         rope.whatTheRopeIsConnectedTo = data.m_GameObjectPickUpCableStart.transform;
         rope.whatIsHangingFromTheRope = data.m_GameObjectFixedCableEnd.transform;
 
+#if VR_INTERACTION
         GrabbableRef = this.gameObject.ForceComponent<Autohand.Grabbable>();
         this.GrabbableRef.onGrab.AddListener(Grabbed);
+#endif
 
     }
 
