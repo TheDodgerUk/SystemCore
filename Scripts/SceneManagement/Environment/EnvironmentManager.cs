@@ -994,6 +994,7 @@ public class EnvironmentManager /*: MonoBehaviour*/
             case "[WiFiAudioTest]": return ProcessWiFiAudioTest;
             case "[CatalogeOnly]": return null;
             case "[MobileWebAR]": return ProcessMobileWebAR;
+            case "[DesertStrike]": return ProcessDesertStrike;
             default:
                 Debug.LogError($"Cannot find :{taggedName}");
                 return null;
@@ -1440,7 +1441,13 @@ public class EnvironmentManager /*: MonoBehaviour*/
         webAR.Init();
 #endif
     }
+    private void ProcessDesertStrike(Scene scene, GameObject obj, ChunkType chunkType)
+    {
+        DesertStrike.DesertStrikeRoot root = obj.ForceComponent<DesertStrike.DesertStrikeRoot>();
+        root.Initialise();
+    }
 
+    
 
     public bool IsNamedTagged(GameObject objectRef)
     {
