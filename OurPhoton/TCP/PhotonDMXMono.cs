@@ -1,5 +1,6 @@
 #if Photon
 using Photon.Pun;
+#endif
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,7 +24,9 @@ public class PhotonDMX: Singleton<PhotonDMX>
 #if !AR_INTERACTION
     private EnttecServer m_EnttecServer;
     //private DP.ProDmx m_ProDmx;
+#if Photon
     private PhotonDMXMono m_PhotonDMXMono;
+#endif
 #endif
 
     private bool m_IsInitilised = false;
@@ -85,7 +88,7 @@ public class PhotonDMX: Singleton<PhotonDMX>
 }
 
 
-
+#if Photon
 public class PhotonDMXMono : MonoBehaviourPun, IPunObservable
 {
     private List<DmxData> m_DmxList = new List<DmxData>();
@@ -184,5 +187,4 @@ public class PhotonDMXMono : MonoBehaviourPun, IPunObservable
     }
 
 }
-
 #endif
