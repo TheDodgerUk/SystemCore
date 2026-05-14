@@ -52,7 +52,7 @@ public class VrInteractionBaseButton : VrInteraction
     private int m_PressedCount = 0;
     public bool AllowPress { get; set; } = true;
 
-    [SerializeField]
+
     public ButtonStateEnum ButtonState
     {
         get { return m_ButtonState; }

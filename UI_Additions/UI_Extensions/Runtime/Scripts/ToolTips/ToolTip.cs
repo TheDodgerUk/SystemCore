@@ -27,7 +27,11 @@ namespace UnityEngine.UI.Extensions
     public class ToolTip : MonoBehaviour
     {
         //text of the tooltip
+#if UNITY_2022_1_OR_NEWER
+        private TMPro.TMP_Text _text;
+#else
         private Text _text;
+#endif
         private RectTransform _rectTransform, canvasRectTransform;
 
         [Tooltip("The canvas used by the tooltip as positioning and scaling reference. Should usually be the root Canvas of the hierarchy this component is in")]
@@ -88,7 +92,13 @@ namespace UnityEngine.UI.Extensions
             get
             {
                 if (instance == null)
+                {
+#if UNITY_2023_1_OR_NEWER
+                    instance = FindFirstObjectByType<ToolTip>();
+#else
                     instance = FindObjectOfType<ToolTip>();
+#endif
+                }
                 return instance;
             }
         }
@@ -114,7 +124,11 @@ namespace UnityEngine.UI.Extensions
             canvasRectTransform = canvas.GetComponent<RectTransform>();
             _layoutGroup = GetComponentInChildren<LayoutGroup>();
 
+#if UNITY_2022_1_OR_NEWER
+            _text = GetComponentInChildren<TMPro.TMP_Text>();
+#else
             _text = GetComponentInChildren<Text>();
+#endif
 
             _inside = false;
 

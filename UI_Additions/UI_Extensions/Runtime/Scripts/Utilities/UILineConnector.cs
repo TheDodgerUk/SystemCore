@@ -11,14 +11,18 @@ namespace UnityEngine.UI.Extensions
 
         // The elements between which line segments should be drawn
         public RectTransform[] transforms;
-        private Vector2[] previousPositions;
+        private Vector3[] previousPositions;
         private RectTransform canvas;
         private RectTransform rt;
         private UILineRenderer lr;
 
         private void Awake()
         {
-            canvas = GetComponentInParent<RectTransform>().GetParentCanvas().GetComponent<RectTransform>();
+            var canvasParent = GetComponentInParent<RectTransform>().GetParentCanvas();
+            if (canvasParent != null)
+            {
+                canvas = canvasParent.GetComponent<RectTransform>();
+            }
             rt = GetComponent<RectTransform>();
             lr = GetComponent<UILineRenderer>();
         }
@@ -36,7 +40,11 @@ namespace UnityEngine.UI.Extensions
                 bool updateLine = false;
                 for (int i = 0; i < transforms.Length; i++)
                 {
-                    if (!updateLine && previousPositions[i] != transforms[i].anchoredPosition)
+                    if (transforms[i] == null)
+                    {
+                        continue;
+                    }
+                    if (!updateLine && previousPositions[i] != transforms[i].position)
                     {
                         updateLine = true;
                     }
@@ -56,6 +64,10 @@ namespace UnityEngine.UI.Extensions
             // First, convert the pivot to worldspace
             for (int i = 0; i < transforms.Length; i++)
             {
+                if (transforms[i] == null)
+                {
+                    continue;
+                }
                 worldSpaces[i] = transforms[i].TransformPoint(thisPivot);
             }
 
@@ -76,10 +88,14 @@ namespace UnityEngine.UI.Extensions
             lr.RelativeSize = false;
             lr.drivenExternally = true;
 
-            previousPositions = new Vector2[transforms.Length];
+            previousPositions = new Vector3[transforms.Length];
             for (int i = 0; i < transforms.Length; i++)
             {
-                previousPositions[i] = transforms[i].anchoredPosition;
+                if (transforms[i] == null)
+                {
+                    continue;
+                }
+                previousPositions[i] = transforms[i].position;
             }
         }
     }

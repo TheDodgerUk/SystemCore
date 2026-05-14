@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable, MetaData(MetaDataType.ContentFood)]
 public class ContentFoodMetaData : ContentPickUpMetaData
 {
-    [SerializeField]
+    [System.Serializable]
     public class FoodParts
     {
         [SerializeField]

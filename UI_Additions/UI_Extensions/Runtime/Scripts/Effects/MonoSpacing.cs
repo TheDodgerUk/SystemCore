@@ -1,5 +1,3 @@
-/// Credit herbst / derived from LetterSpacing by Deeperbeige
-/// Sourced from - http://forum.unity3d.com/threads/adjustable-character-spacing-free-script.288277/
 /*
 
 Produces an simple mono-spacing effect on UI Text components.
@@ -40,11 +38,25 @@ use HTML-like tags in your text. Try it out, you'll see what I mean. It doesn't
 break down entirely, but it doesn't really do what you'd want either.
 
 */
-
+#if !UNITY_2022_1_OR_NEWER
 using System.Collections.Generic;
+#endif
 
+using System;
+
+/// Credit herbst / derived from LetterSpacing by Deeperbeige
+/// Sourced from - http://forum.unity3d.com/threads/adjustable-character-spacing-free-script.288277/
 namespace UnityEngine.UI.Extensions
 {
+#if UNITY_2022_1_OR_NEWER
+    [Obsolete("MonoSpacing is not supported in Unity 2022.1 or newer. Use TMPro instead.")]
+    public class MonoSpacing : BaseMeshEffect
+    {
+        public override void ModifyMesh(VertexHelper vh)
+        {
+        }
+    }
+#else
     [AddComponentMenu("UI/Effects/Extensions/Mono Spacing")]
     [RequireComponent(typeof(Text))]
     [RequireComponent(typeof(RectTransform))]
@@ -58,6 +70,7 @@ namespace UnityEngine.UI.Extensions
         public bool UseHalfCharWidth = false;
 
         private RectTransform rectTransform;
+
         private Text text;
 
 		protected MonoSpacing() { }
@@ -65,6 +78,7 @@ namespace UnityEngine.UI.Extensions
         protected override void Awake()
         {
             text = GetComponent<Text>();
+
             if (text == null)
             {
                 Debug.LogWarning("MonoSpacing: Missing Text component");
@@ -73,13 +87,13 @@ namespace UnityEngine.UI.Extensions
             rectTransform = text.GetComponent<RectTransform>();
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         protected override void OnValidate()
 		{
 			Spacing = m_spacing;
 			base.OnValidate();
 		}
-		#endif
+#endif
 		
 		public float Spacing
 		{
@@ -104,29 +118,29 @@ namespace UnityEngine.UI.Extensions
 			float    letterOffset    = Spacing * (float)text.fontSize / 100f;
 			float    alignmentFactor = 0;
 			int      glyphIdx        = 0;
-			
-			switch (text.alignment)
-			{
-			case TextAnchor.LowerLeft:
-			case TextAnchor.MiddleLeft:
-			case TextAnchor.UpperLeft:
-				alignmentFactor = 0f;
-				break;
-				
-			case TextAnchor.LowerCenter:
-			case TextAnchor.MiddleCenter:
-			case TextAnchor.UpperCenter:
-				alignmentFactor = 0.5f;
-				break;
-				
-			case TextAnchor.LowerRight:
-			case TextAnchor.MiddleRight:
-			case TextAnchor.UpperRight:
-				alignmentFactor = 1f;
-				break;
-			}
-			
-			for (int lineIdx=0; lineIdx < lines.Length; lineIdx++)
+
+            switch (text.alignment)
+            {
+                case TextAnchor.LowerLeft:
+                case TextAnchor.MiddleLeft:
+                case TextAnchor.UpperLeft:
+                    alignmentFactor = 0f;
+                    break;
+
+                case TextAnchor.LowerCenter:
+                case TextAnchor.MiddleCenter:
+                case TextAnchor.UpperCenter:
+                    alignmentFactor = 0.5f;
+                    break;
+
+                case TextAnchor.LowerRight:
+                case TextAnchor.MiddleRight:
+                case TextAnchor.UpperRight:
+                    alignmentFactor = 1f;
+                    break;
+            }
+
+            for (int lineIdx=0; lineIdx < lines.Length; lineIdx++)
 			{
 				string line = lines[lineIdx];
                 float lineOffset = (line.Length - 1) * letterOffset * (alignmentFactor) - (alignmentFactor - 0.5f) * rectTransform.rect.width;
@@ -187,4 +201,5 @@ namespace UnityEngine.UI.Extensions
             vh.AddUIVertexTriangleStream(verts);
         }
 	}
-}
+#endif
+    }

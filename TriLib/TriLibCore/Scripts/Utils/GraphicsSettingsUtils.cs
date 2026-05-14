@@ -8,12 +8,12 @@ namespace TriLibCore.Utils
     public static class GraphicsSettingsUtils
     {
         /// <summary>Returns <c>true</c> if the project is using the Standard Rendering Pipeline.</summary>
-        public static bool IsUsingStandardPipeline => GraphicsSettings.renderPipelineAsset == null;
+        public static bool IsUsingStandardPipeline => GraphicsSettings.defaultRenderPipeline == null;
 
         /// <summary>Returns <c>true</c> if the project is using the Universal Rendering Pipeline.</summary>
-        public static bool IsUsingUniversalPipeline => GraphicsSettings.renderPipelineAsset != null && GraphicsSettings.renderPipelineAsset.name.StartsWith("UniversalRP");
+        public static bool IsUsingUniversalPipeline => GraphicsSettings.defaultRenderPipeline != null && GraphicsSettings.defaultRenderPipeline.name.StartsWith("UniversalRP");
 
         /// <summary>Returns <c>true</c> if the project is using the HDRP Rendering Pipeline.</summary>
-        public static bool IsUsingHDRPPipeline => GraphicsSettings.renderPipelineAsset != null && GraphicsSettings.renderPipelineAsset.name == "HDRenderPipelineAsset";
+        public static bool IsUsingHDRPPipeline => GraphicsSettings.defaultRenderPipeline != null && GraphicsSettings.defaultRenderPipeline.name == "HDRenderPipelineAsset";
     }
 }

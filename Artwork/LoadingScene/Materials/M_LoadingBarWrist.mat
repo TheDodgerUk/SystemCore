@@ -8,8 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: M_LoadingBarWrist
-  m_Shader: {fileID: -6465566751694194690, guid: d6e3b9ef44f3eab498e7b75bcbf26ff6,
-    type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: d6e3b9ef44f3eab498e7b75bcbf26ff6, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -19,7 +18,8 @@ Material:
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
-  disabledShaderPasses: []
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -88,7 +88,15 @@ Material:
         m_Texture: {fileID: 2800000, guid: 3aafa3430e6d5d6408e253c11f5e65f9, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_c7c441b8beaa41849aeccabe73b457b3_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: 3aafa3430e6d5d6408e253c11f5e65f9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _SampleTexture2D_d985585478014fedb967949965ddc382_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 00db8af0baf474a4d9a866c658a3f48e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_d985585478014fedb967949965ddc382_Texture_1_Texture2D:
         m_Texture: {fileID: 2800000, guid: 00db8af0baf474a4d9a866c658a3f48e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -147,6 +155,7 @@ Material:
     - _HologramColor: {r: 0, g: 0.5757575, b: 1, a: 0}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!114 &2769732192007602446
 MonoBehaviour:
   m_ObjectHideFlags: 11
@@ -159,4 +168,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 6
+  version: 10

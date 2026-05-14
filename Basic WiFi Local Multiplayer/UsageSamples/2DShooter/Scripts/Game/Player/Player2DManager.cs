@@ -114,12 +114,12 @@ public class Player2DManager : MonoBehaviour
 	   }
 		else
 		{
-			if (myRigidbody.velocity.x != lastVelocityX) {
-				lastVelocityX = myRigidbody.velocity.x;
+			if (myRigidbody.linearVelocity.x != lastVelocityX) {
+				lastVelocityX = myRigidbody.linearVelocity.x;
 				
 			}
 			
-			if(myRigidbody.velocity.x == lastVelocityX && myRigidbody.velocity.y == lastVelocityY &&!jumped)
+			if(myRigidbody.linearVelocity.x == lastVelocityX && myRigidbody.linearVelocity.y == lastVelocityY &&!jumped)
 			{
 			   UpdateAnimator ("OnIdle");
 			}

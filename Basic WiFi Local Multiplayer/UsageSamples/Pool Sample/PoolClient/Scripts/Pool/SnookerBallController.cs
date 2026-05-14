@@ -37,7 +37,7 @@ public class SnookerBallController : MonoBehaviour {
 	{
 	    if (PoolNetworkManager.instance.startedGame) 
 		{
-		  float speed = rigidbody.velocity.magnitude;
+		  float speed = rigidbody.linearVelocity.magnitude;
 		  
 	      if(speed > 0)
 	      { 
@@ -61,10 +61,10 @@ public class SnookerBallController : MonoBehaviour {
 	
 	try{
 		rigidbody = GetComponent<Rigidbody>();
-		if (rigidbody.velocity.y > 0) {
-			var velocity = rigidbody.velocity;
+		if (rigidbody.linearVelocity.y > 0) {
+			var velocity = rigidbody.linearVelocity;
 			velocity.y *= 0.3f;
-			rigidbody.velocity = velocity;
+			rigidbody.linearVelocity = velocity;
 		}
 		
 		if(onMove)

@@ -16,7 +16,9 @@ namespace ConsoleExtraEnum
         Photon_Receive,
         VR, 
         Generic,
-        DebugLogging
+        DebugLogging,
+        OSC_Sent,
+        OSC_Receive
     }
 
 
