@@ -22,7 +22,9 @@ public class DmxData
 public class PhotonDMX: Singleton<PhotonDMX>
 {
 #if !AR_INTERACTION
+#if Photon
     private EnttecServer m_EnttecServer;
+#endif
     //private DP.ProDmx m_ProDmx;
 #if Photon
     private PhotonDMXMono m_PhotonDMXMono;
@@ -46,6 +48,7 @@ public class PhotonDMX: Singleton<PhotonDMX>
     private void InternalInitilise()
     {
 #if !AR_INTERACTION
+#if Photon
         if (m_EnttecServer == null)
         {
             m_EnttecServer = new EnttecServer();
@@ -61,6 +64,7 @@ public class PhotonDMX: Singleton<PhotonDMX>
             m_IsInitilised = true;
         }
 #endif
+#endif
     }
 
     public void CollectDmxData(Action<List<DmxData>> callback) => PhotonDMXMono.DmxMessageRecivedCallback += callback;
@@ -70,6 +74,7 @@ public class PhotonDMX: Singleton<PhotonDMX>
     public void SendDmxData(int dmx, byte dmxValue)
     {
 #if !AR_INTERACTION
+#if Photon
         if(m_PhotonDMXMono == null)
         {
             List<DmxData> dataList = new List<DmxData>();
@@ -83,6 +88,7 @@ public class PhotonDMX: Singleton<PhotonDMX>
             m_PhotonDMXMono.SendDmxData(dmx, dmxValue);
         }
         m_EnttecServer.SendData(dmx, dmxValue);
+#endif
 #endif
     }
 }

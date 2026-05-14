@@ -58,10 +58,10 @@ public class Core : MonoBehaviour
 
     public static AssetBundles AssetBundlesRef { get; private set; }
     public static AssetsLocal AssetsLocalRef { get; private set; }
-#if Photon
+
     public static PhotonGeneric PhotonGenericRef { get; private set; }
     public static PhotonMultiplayer PhotonMultiplayerRef { get; private set; }
-#endif
+
 
 
     [SerializeField, ReadOnly]

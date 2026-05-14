@@ -12,7 +12,9 @@ public class NurfGun : MonoBehaviour
 
     public class Ammo
     {
+        #if Photon
         public PhotonRigidbodyTurnonOffView m_BulletView;
+#endif
         public Rigidbody m_RealBullet;
         public Transform m_FakeBullet;
     }
@@ -67,11 +69,13 @@ public class NurfGun : MonoBehaviour
 
                 // this need to make sure it all setup
                 newAmmo.m_RealBullet.gameObject.SetActive(true);
+#if Photon
                 newAmmo.m_BulletView = newAmmo.m_RealBullet.gameObject.ForceComponent<PhotonRigidbodyTurnonOffView>();
                 Core.Mono.WaitForFrames(5, () =>
                 {
                     newAmmo.m_RealBullet.gameObject.SetActive(false);
                 });
+#endif
 
             }
             else

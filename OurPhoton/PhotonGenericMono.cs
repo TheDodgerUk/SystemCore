@@ -2,6 +2,7 @@
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
+#endif
 using System;
 
 
@@ -61,7 +62,9 @@ public class PhotonGeneric
     {
         ConsoleExtra.Log($"SendGenericHeaderAndData : {subHeader}", null, ConsoleExtraEnum.EDebugType.Photon_Sent);
         var rawData = Json.JsonNet.WriteToText(data, true);
+#if Photon
         m_PhotonGenericMono.SendMessageGenericHeaderAndData(subHeader, rawData, group);
+#endif
     }
 
     public void CollectGenericHeaderAndData<T>(string header, Action<T> callback)
@@ -97,7 +100,9 @@ public class PhotonGeneric
     public void SendVrCreation(VrCreationData data)
     {
         var rawData = Json.JsonNet.WriteToText(data, true);
+#if Photon
         m_PhotonGenericMono.SendVrCreation(rawData);
+#endif
 
     }
 
@@ -112,96 +117,131 @@ public class PhotonGeneric
 
     public void CollectVrCreation(Action<string,  VrInteraction> callback)
     {
+#if Photon
         PhotonGenericMono.VRAllCreationDataCallback += callback;
+#endif
     }
 
     private void InternalCollectGenericHeader(Action<string> callback)
     {
+#if Photon
         PhotonGenericMono.GenericHeaderCallback += callback;
+#endif
     }
 
     private void InternalCollectGenericHeaderAndData(Action<string, string> callback)
     {
+#if Photon
         PhotonGenericMono.GenericHeaderAndDataCallback += callback;
+#endif
     }
 
     private void InternalCollectVrInteractionMessageData(Action<int, string, string> callback)
     {
+#if Photon
         PhotonGenericMono.VrInteractionMessageTypeAndMessageCallback += callback;
+#endif
     }
 
     private void InternalCollectVrInteractionIntData(Action<string> callback)
     {
+#if Photon
         PhotonGenericMono.VrInteractionDataIntCallback += callback;
+#endif
     }
 
     private void InternalCollectDebugIntData(Action<int> callback)
     {
+#if Photon
         PhotonGenericMono.DebugIntCallback += callback;
+#endif
     }
 
     private void InternalCollectDebugIntDataData(Action<int, string> callback)
     {
+#if Photon
         PhotonGenericMono.DebugDataIntCallback += callback;
+#endif
     }
 
     private void InternalCollectAchievmentData(Action<string, string> callback)
     {
+#if Photon
         PhotonGenericMono.AchievmentDataCallback += callback;
+#endif
     }
 
     private void InternalCollectLeaderBoardData(Action<string, string> callback)
     {
+#if Photon
         PhotonGenericMono.LeaderBoardDataCallback += callback;
+#endif
     }
     private void InternalCollectUserData(Action<string, string> callback)
     {
+#if Photon
         PhotonGenericMono.UserDataCallback += callback;
+#endif
     }
 
     public void SendGenericHeader(string subHeader, ReceiverGroup group = ReceiverGroup.All)
     {
+#if Photon
         m_PhotonGenericMono.SendGenericHeader(subHeader, group);
+#endif
     }
 
     private void InternalCollectVrCreationData(Action<string> callback)
     {
+#if Photon
         PhotonGenericMono.VRCreationDataCallback += callback;
+#endif
     }
 
     public void SendDebugInt(int data)
     {
+#if Photon
         m_PhotonGenericMono.SendMessageDebugInt(data);
+#endif
     }
 
     public void SendDebugIntData<T>(int data1, T data2)
     {
         var rawData = Json.JsonNet.WriteToText(data2, true);
+#if Photon
         m_PhotonGenericMono.SendMessageDebugIntData(data1, rawData);
+#endif
     }
 
     public void SendAchievmentData<T>(T data)
     {
         var rawData = Json.JsonNet.WriteToText(data, true);
+#if Photon
         m_PhotonGenericMono.SendAchievmentData(rawData, typeof(T).Name);
+#endif
     }
 
     public void SendLeaderBoardData<T>(T data)
     {
         var rawData = Json.JsonNet.WriteToText(data, true);
+#if Photon
         m_PhotonGenericMono.SendLeaderBoardData(rawData, typeof(T).Name);
+#endif
     }
 
     public void SendUserData<T>(T data)
     {
         var rawData = Json.JsonNet.WriteToText(data, true);
+#if Photon
         m_PhotonGenericMono.SendUserData(rawData, typeof(T).Name);
+#endif
     }
 
 
 
     public void SendGenericVrInterationMessage<T>(VrInteraction interaction, T Message, ReceiverGroup group = ReceiverGroup.Others)
     {
+#if Photon
         if (Core.PhotonMultiplayerRef.CurrentRoom != null)
         {
             VrInteractionMessageStringData messageData = new VrInteractionMessageStringData();
@@ -212,10 +252,12 @@ public class PhotonGeneric
             var rawData = Json.JsonNet.WriteToText(messageData, true);
             m_PhotonGenericMono.SendMessageVrInteractionMessageData(messageData.GuidRef, typeof(T).Name, rawData, group);
         }
+#endif
     }
 
     public void CollectGenericVrInterationMessage<T>(VrInteraction interaction, Action<T> callback)
     {
+#if Photon
         var className = typeof(T).Name;
         var classGUID = className.GetHashCode();
         var foundValidCopy = GlobalConsts.m_PhotonGuidSafety.Find(e => e.Name == className && e.GUID == classGUID);
@@ -259,6 +301,7 @@ public class PhotonGeneric
                 }
             }
         });
+#endif
     }
 
 
@@ -266,6 +309,7 @@ public class PhotonGeneric
 
     public void SendGenericVrInterationIntMessage(VrInteraction interaction, int Message, ReceiverGroup group = ReceiverGroup.Others)
     {
+#if Photon
         if (Core.PhotonMultiplayerRef.CurrentRoom != null)
         {
             VrInteractionMessageIntData messageData = new VrInteractionMessageIntData();
@@ -275,10 +319,12 @@ public class PhotonGeneric
             var rawData = Json.JsonNet.WriteToText(messageData, true);
             m_PhotonGenericMono.SendMessageVrInteractionIntData(rawData, group);
         }
+#endif
     }
 
     public void CollectGenericVrInterationIntMessage(VrInteraction interaction, int intMessage, Action callback)
     {
+#if Photon
         InternalCollectVrInteractionIntData((messageData) =>
         {
             if (Core.PhotonMultiplayerRef.CurrentRoom != null)
@@ -293,6 +339,7 @@ public class PhotonGeneric
                     }
             }
         });
+#endif
     }
 
     public void CollectDebugIntMessage(int intMessage, Action callback)
@@ -541,4 +588,4 @@ public class PhotonGenericMono : MonoBehaviourPun, IOnEventCallback
         PhotonNetwork.RaiseEvent((byte)PhotonVrInteraction.EventIDEnum.VRCreation, content, raiseEventOptions, SendOptions.SendReliable);
     }
 }
-#endif
+
