@@ -155,12 +155,6 @@ namespace UnityEngine.UI.Extensions
             SetVerticesDirty();
         }
 
-        public void SetArc(float arc)
-        {
-            Arc = arc;
-            SetVerticesDirty();
-        }
-
         public void SetArcSteps(int steps)
         {
             ArcSteps = steps;

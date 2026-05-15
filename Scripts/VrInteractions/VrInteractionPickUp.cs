@@ -207,7 +207,7 @@ public class VrInteractionPickUp : VrInteraction
         PickupMessage newMessage = new PickupMessage();
         newMessage.MessageActorNumber = Core.PhotonMultiplayerRef.MySelf.ActorNumber;
         newMessage.PickUp = pickup;
-        newMessage.velocity = grab.body.velocity;
+        newMessage.velocity = grab.body.linearVelocity;
         newMessage.angularVelocity = grab.body.angularVelocity;
         newMessage.Position = grab.body.position;
         newMessage.Rotation = grab.body.rotation;
@@ -289,7 +289,7 @@ public class VrInteractionPickUp : VrInteraction
         if (m_Rigidbody.isKinematic == false)
         {
 #if VR_INTERACTION
-            GrabbableRef.body.velocity = message.velocity;
+            GrabbableRef.body.linearVelocity = message.velocity;
             GrabbableRef.body.angularVelocity = message.angularVelocity;
             GrabbableRef.body.position = message.Position;
             GrabbableRef.body.rotation = message.Rotation;

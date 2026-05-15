@@ -31,6 +31,9 @@ namespace UnityEngine.UI.Extensions
             Basic,
             Improved,
             Catenary,
+            AnimationCurve,
+            Straight,
+            Square,
         }
 
 		private const float MIN_MITER_JOIN = 15 * Mathf.Deg2Rad;
@@ -111,18 +114,10 @@ namespace UnityEngine.UI.Extensions
 
 			set
 			{
-				if (m_points == value) return;
-
-				if (value == null || value.Length == 0)
-				{
-					m_points = new Vector2[1];
-				}
-				else
-				{
-                    m_points = value;
-                }
-
-                SetAllDirty();
+				if (m_points == value)
+					return;
+				m_points = value;
+				SetAllDirty();
 			}
 		}
 
@@ -145,27 +140,84 @@ namespace UnityEngine.UI.Extensions
 
 		private void PopulateMesh(VertexHelper vh, Vector2[] pointsToDraw)
 		{
-			//If Bezier is desired, pick the implementation
-			if (BezierMode != BezierType.None && BezierMode != BezierType.Catenary && pointsToDraw.Length > 3) {
-				BezierPath bezierPath = new BezierPath ();
+            if (BezierMode == BezierType.AnimationCurve)
+            {
+                AnimationCurve curve = new AnimationCurve();
+                for (int i = 0; i < pointsToDraw.Length; i++)
+                {
+                    Keyframe newFrame = new Keyframe();
+                    newFrame.time = pointsToDraw[i].x;
+                    newFrame.value = pointsToDraw[i].y;
+                    curve.AddKey(newFrame);
+                }
 
-				bezierPath.SetControlPoints (pointsToDraw);
-				bezierPath.SegmentsPerCurve = bezierSegmentsPerCurve;
-				List<Vector2> drawingPoints;
-				switch (BezierMode) {
-				case BezierType.Basic:
-					drawingPoints = bezierPath.GetDrawingPoints0 ();
-					break;
-				case BezierType.Improved:
-					drawingPoints = bezierPath.GetDrawingPoints1 ();
-					break;
-				default:
-					drawingPoints = bezierPath.GetDrawingPoints2 ();
-					break;
-				}
+                List<Vector2> listOfPoints = new List<Vector2>();
+                var lastX = pointsToDraw[pointsToDraw.Length - 1].x;
+                for (int i = 0; i < bezierSegmentsPerCurve; i++)
+                {
+                    float time = lastX / (float)bezierSegmentsPerCurve;
+                    time *= i;
+                    var value = curve.Evaluate(time);
+                    listOfPoints.Add(new Vector2(time, value));
+                }
+                pointsToDraw = listOfPoints.ToArray();
+            }
+            else if (BezierMode == BezierType.Straight)
+            {
+                // do nothing 
+            }
+            else if (BezierMode == BezierType.Square)
+            {
+                if(pointsToDraw.Length ==2)
+                {
+                    List<Vector2> listOfPoints = new List<Vector2>();
+                    listOfPoints.Add(new Vector2(pointsToDraw[0].x, pointsToDraw[0].y));
+                    listOfPoints.Add(new Vector2(pointsToDraw[1].x, pointsToDraw[0].y));
+                    pointsToDraw = listOfPoints.ToArray();
+                }
+                else
+                {
+                    List<Vector2> listOfPoints = new List<Vector2>();
+                    listOfPoints.Add(new Vector2(pointsToDraw[0].x, pointsToDraw[0].y));
+                    for (int i = 1; i < pointsToDraw.Length; i++)
+                    {
+                        listOfPoints.Add(new Vector2(pointsToDraw[i].x, pointsToDraw[i-1].y));
+                        if (i != pointsToDraw.Length - 1)
+                        {
+                            listOfPoints.Add(new Vector2(pointsToDraw[i].x, pointsToDraw[i].y));
+                        }
+                    }
+                    pointsToDraw = listOfPoints.ToArray();
+                }
+            }
+            else
+            {
+                //If Bezier is desired, pick the implementation
+                if (BezierMode != BezierType.None && BezierMode != BezierType.Catenary && pointsToDraw.Length > 3)
+                {
+                    BezierPath bezierPath = new BezierPath();
 
-				pointsToDraw = drawingPoints.ToArray ();
-			}
+                    bezierPath.SetControlPoints(pointsToDraw);
+                    bezierPath.SegmentsPerCurve = bezierSegmentsPerCurve;
+                    List<Vector2> drawingPoints;
+                    switch (BezierMode)
+                    {
+                        case BezierType.Basic:
+                            drawingPoints = bezierPath.GetDrawingPoints0();
+                            break;
+                        case BezierType.Improved:
+                            drawingPoints = bezierPath.GetDrawingPoints1();
+                            break;
+                        default:
+                            drawingPoints = bezierPath.GetDrawingPoints2();
+                            break;
+                    }
+
+                    pointsToDraw = drawingPoints.ToArray();
+                }
+            }
+
+
 			if (BezierMode == BezierType.Catenary && pointsToDraw.Length == 2) {
 				CableCurve cable = new CableCurve (pointsToDraw);
 				cable.slack = Resolution;
@@ -186,7 +238,6 @@ namespace UnityEngine.UI.Extensions
 			// Generate the quads that make up the wide line
 			var segments = new List<UIVertex[]> ();
 			if (lineList) {
-				//Loop through list in line pairs, skipping drawing between lines
 				for (var i = 1; i < pointsToDraw.Length; i += 2) {
 					var start = pointsToDraw [i - 1];
 					var end = pointsToDraw [i];
@@ -197,15 +248,13 @@ namespace UnityEngine.UI.Extensions
 						segments.Add (CreateLineCap (start, end, SegmentType.Start));
 					}
 
-					// Originally, UV's had to be wrapped per segment to ensure textures rendered correctly, however when tested in 2019.4, this no longer seems to be an issue.
-					segments.Add(CreateLineSegment(start, end, SegmentType.Middle));
+					segments.Add(CreateLineSegment(start, end, SegmentType.Middle, segments.Count > 1 ? segments[segments.Count - 2] : null));
 
 					if (lineCaps) {
 						segments.Add (CreateLineCap (start, end, SegmentType.End));
 					}
 				}
 			} else {
-				//Draw full lines
 				for (var i = 1; i < pointsToDraw.Length; i++) {
 					var start = pointsToDraw [i - 1];
 					var end = pointsToDraw [i];
@@ -287,7 +336,7 @@ namespace UnityEngine.UI.Extensions
 				PopulateMesh (vh, m_points);
 
 			}
-			if (m_segments != null && m_segments.Count > 0) {
+			else if (m_segments != null && m_segments.Count > 0) {
 				GeneratedUVs ();
 				vh.Clear ();
 
@@ -296,6 +345,8 @@ namespace UnityEngine.UI.Extensions
 					PopulateMesh (vh, pointsToDraw);
 				}
 			} 
+
+
         }
 
 		private UIVertex[] CreateLineCap(Vector2 start, Vector2 end, SegmentType type)
@@ -417,7 +468,7 @@ namespace UnityEngine.UI.Extensions
             {
                 return Segments[segmentIndex - 1][index - 1];
             }
-            else if (Segments?.Count > 0)
+            else if (Segments.Count > 0)
             {
                 var segmentIndexCount = 0;
                 var indexCount = index;
@@ -439,29 +490,6 @@ namespace UnityEngine.UI.Extensions
             {
                 return Points[index - 1];
             }
-        }
-
-		/// <summary>
-        /// Calculates the position of a point on the curve, given t (0-1), start point, control points and end point.
-        /// </summary>
-        /// <param name="t">Required Percentage between start and end point, in the range 0 to 1</param>
-		/// <param name="p1">Required Starting point</param>
-		/// <param name="p1">Required Control point 1</param>
-		/// <param name="p1">Required Control point 2</param>
-		/// <param name="p1">Required End point</param>
-        /// <returns>Vector2 position of point on curve at t percentage between p1 and p4</returns>
-		public Vector2 CalculatePointOnCurve(float t, Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4)
-        {
-            var t2 = t * t;
-            var t3 = t2 * t;
-
-            var x = p1.x + (-p1.x * 3 + t * (3 * p1.x - p1.x * t)) * t + (3 * p2.x + t * (-6 * p2.x + p2.x * 3 * t)) * t +
-                    (p3.x * 3 - p3.x * 3 * t) * t2 + p4.x * t3;
-            
-            var y = p1.y + (-p1.y * 3 + t * (3 * p1.y - p1.y * t)) * t + (3 * p2.y + t * (-6 * p2.y + p2.y * 3 * t)) * t +
-                    (p3.y * 3 - p3.y * 3 * t) * t2 + p4.y * t3;
-
-            return new Vector2(x, y);
         }
 
         /// <summary>
@@ -490,19 +518,6 @@ namespace UnityEngine.UI.Extensions
             dot /= from_p1_to_p2.magnitude;
             float t = Mathf.Clamp01(dot);
             return p1 + from_p1_to_p2 * t;
-        }
-
-        protected override void OnEnable()
-        {
-			base.OnEnable();
-            if (m_points == null || m_points?.Length == 0)
-            {
-				m_points = new Vector2[1];
-            }
-			if (transform.GetComponent<RectTransform>().position != Vector3.zero)
-			{
-				Debug.LogWarning("A Line Renderer component should be on a RectTransform positioned at (0,0,0), do not use in child Objects.\nFor best results, create separate RectTransforms as children of the canvas positioned at (0,0) for a UILineRenderer and do not move.");
-			}
         }
     }
 }

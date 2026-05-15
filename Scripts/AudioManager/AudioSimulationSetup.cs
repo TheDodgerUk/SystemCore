@@ -496,7 +496,9 @@ public class AudioSimulationSetup : MonoBehaviour
             m_SteamAudioManager.phononBaker.CancelBake();
             SteamAudioSource.m_RunUpdate = true;
             // Re-apply the old baked data, if there is any.
+#if HouseBuilder
             Core.Audio.LoadSaveGeneratedSoundRef.ConfirmUpdateGeneratedSound(null, false);
+#endif
 #endif
         }
     }

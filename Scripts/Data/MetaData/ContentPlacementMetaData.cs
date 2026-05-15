@@ -291,7 +291,7 @@ public class ContentPlacementMetaData : MetaData
         return true;
     }
 
-#if !CATALOG_PROGRAM && HouseBuilder
+#if !CATALOG_PROGRAM
     public static bool RaycastHit(GameObject SnapPoint, Interaction targetInteraction, out RaycastHit raycastHit)
     {
         var all = Physics.RaycastAll(SnapPoint.transform.position, SnapPoint.transform.forward).ToList();

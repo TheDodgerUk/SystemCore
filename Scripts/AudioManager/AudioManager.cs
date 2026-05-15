@@ -13,9 +13,9 @@ public class AudioManager : MonoBehaviour
     private List<AudioSource> m_Lights;
     private Transform m_Transform;
     public AudioSimulationSetup AudioSimulationSetupRef { get; private set; }
-#if HouseBuilder
+
     public LoadSaveGeneratedSound LoadSaveGeneratedSoundRef { get; private set; }
-#endif
+
 #if Steam_Audio
     public SteamAudio.SteamAudioManager SteamAudioManagerRef { get; private set; }
 #endif
@@ -25,9 +25,8 @@ public class AudioManager : MonoBehaviour
         m_Transform = transform;
 
         AudioSimulationSetupRef = GetComponentInChildren<AudioSimulationSetup>();
-#if HouseBuilder
         LoadSaveGeneratedSoundRef = new LoadSaveGeneratedSound();
-#endif
+
 #if Steam_Audio
         SteamAudioManagerRef = GetComponentInChildren<SteamAudio.SteamAudioManager>(true);
 #endif

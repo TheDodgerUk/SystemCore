@@ -13,9 +13,9 @@ public class ContentLightingMetaData : MetaData
         [SerializeField]
         public string m_GameObjectName = "";
 
-#if HouseBuilder
+
         public Fixtures.CapabilityType m_CapabilityTypeEnum;
-#endif
+
 
         [System.NonSerialized]
         public GameObject m_GameObject;
@@ -31,10 +31,9 @@ public class ContentLightingMetaData : MetaData
     [SerializeField]
     public string m_JsonFileName = "";
 
-#if HouseBuilder
+
     [System.NonSerialized]
     public Fixtures.Fixture m_Fixure = new Fixtures.Fixture();
-#endif
 
     [SerializeField]
     public List<GameObjectLinks> m_GameObjectLinks = new List<GameObjectLinks>();
@@ -51,7 +50,7 @@ public class ContentLightingMetaData : MetaData
     [SerializeField]
     public float m_SpeedPan = 400f;
 
-#if !CATALOG_PROGRAM && HouseBuilder
+#if !CATALOG_PROGRAM
     public void CollectAllData(InteractionGameObject inter)
     {
         if (this.m_Fixure != null || this.m_Fixure.Modes != null)

@@ -6,9 +6,9 @@ using UnityEngine;
 public class FixtureContainer : MonoSingleton<FixtureContainer>
 {
     private const string NOT_USE = "keep";
-#if HouseBuilder
+
     private Dictionary<string, Fixtures.Fixture> m_FixtureDictionary = new Dictionary<string, Fixtures.Fixture>();
-#endif
+
     private List<string> m_FixtureNamesList = new List<string>();
     public bool AssetsLoaded { get; private set; }
 
@@ -22,12 +22,12 @@ public class FixtureContainer : MonoSingleton<FixtureContainer>
         {
             TaskAction task = new TaskAction(files.Count, () =>
             {
-#if HouseBuilder
+
                 foreach (var item in m_FixtureDictionary.Keys)
                 {
                     m_FixtureNamesList.Add(item.ToLower());
                 }
-#endif
+
                 AssetsLoaded = true;
             });
 
@@ -41,13 +41,13 @@ public class FixtureContainer : MonoSingleton<FixtureContainer>
                         TextAsset textAsset = item;
                         if (textAsset != null)
                         {
-#if HouseBuilder
+
                             var data = Fixtures.Fixture.FromJson(textAsset.text, files[localIndex]);
                             if (data != null)
                             {
                                 m_FixtureDictionary.Add(files[localIndex].ToLower(), data);
                             }
-#endif
+
                         }
                     }
                     task.Increment();
@@ -56,7 +56,7 @@ public class FixtureContainer : MonoSingleton<FixtureContainer>
         });
     }
 
-#if HouseBuilder
+
     public Fixtures.Fixture GetFixture(string fixture)
     {
         fixture = fixture.ToLower();
@@ -121,5 +121,5 @@ public class FixtureContainer : MonoSingleton<FixtureContainer>
        
         return channelNames;
     }
-#endif
+
 }
