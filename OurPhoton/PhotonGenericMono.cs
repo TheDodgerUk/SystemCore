@@ -4,7 +4,7 @@ using Photon.Pun;
 using Photon.Realtime;
 #endif
 using System;
-
+using UnityEngine;
 
 public class PhotonGeneric
 {
@@ -58,7 +58,7 @@ public class PhotonGeneric
     }
 
 
-    public void SendGenericHeaderAndData<T>(string subHeader, T data, ReceiverGroup group = ReceiverGroup.All) where T : class
+    public void SendGenericHeaderAndData<T>(string subHeader, T data, Photon.Realtime.ReceiverGroup group = Photon.Realtime.ReceiverGroup.All) where T : class
     {
         ConsoleExtra.Log($"SendGenericHeaderAndData : {subHeader}", null, ConsoleExtraEnum.EDebugType.Photon_Sent);
         var rawData = Json.JsonNet.WriteToText(data, true);
@@ -184,7 +184,7 @@ public class PhotonGeneric
 #endif
     }
 
-    public void SendGenericHeader(string subHeader, ReceiverGroup group = ReceiverGroup.All)
+    public void SendGenericHeader(string subHeader, Photon.Realtime.ReceiverGroup group = Photon.Realtime.ReceiverGroup.All)
     {
 #if Photon
         m_PhotonGenericMono.SendGenericHeader(subHeader, group);
@@ -239,7 +239,7 @@ public class PhotonGeneric
 
 
 
-    public void SendGenericVrInterationMessage<T>(VrInteraction interaction, T Message, ReceiverGroup group = ReceiverGroup.Others)
+    public void SendGenericVrInterationMessage<T>(VrInteraction interaction, T Message, Photon.Realtime.ReceiverGroup group = Photon.Realtime.ReceiverGroup.Others)
     {
 #if Photon
         if (Core.PhotonMultiplayerRef.CurrentRoom != null)
@@ -307,7 +307,7 @@ public class PhotonGeneric
 
 
 
-    public void SendGenericVrInterationIntMessage(VrInteraction interaction, int Message, ReceiverGroup group = ReceiverGroup.Others)
+    public void SendGenericVrInterationIntMessage(VrInteraction interaction, int Message, Photon.Realtime.ReceiverGroup group = Photon.Realtime.ReceiverGroup.Others)
     {
 #if Photon
         if (Core.PhotonMultiplayerRef.CurrentRoom != null)
@@ -402,7 +402,11 @@ public class PhotonGeneric
 }
 
 
+#if Photon
 public class PhotonGenericMono : MonoBehaviourPun, IOnEventCallback
+#else
+public class PhotonGenericMono : MonoBehaviour
+#endif
 {
     public static Action<string> GenericHeaderCallback;
     public static Action<string, string> GenericHeaderAndDataCallback;
@@ -427,7 +431,7 @@ public class PhotonGenericMono : MonoBehaviourPun, IOnEventCallback
         PhotonNetwork.RemoveCallbackTarget(this);
     }
 
-
+#if Photon
     public void OnEvent(EventData photonEvent)
     {
         byte eventCode = photonEvent.Code;
@@ -514,32 +518,33 @@ public class PhotonGenericMono : MonoBehaviourPun, IOnEventCallback
 
         }
     }
+#endif
 
 
 
 
-    public void SendGenericHeader(string subHeader, ReceiverGroup group = ReceiverGroup.All)
+    public void SendGenericHeader(string subHeader, Photon.Realtime.ReceiverGroup group = Photon.Realtime.ReceiverGroup.All)
     {
         object[] content = new object[] { subHeader }; // Array contains the target position and the IDs of the selected units
         RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = group }; // You would have to set the Receivers to All in order to receive this event on the local client as well
         PhotonNetwork.RaiseEvent((byte)PhotonVrInteraction.EventIDEnum.GenericHeader, content, raiseEventOptions, SendOptions.SendReliable);
     }
 
-    public void SendMessageVrInteractionIntData(string data, ReceiverGroup group = ReceiverGroup.Others)
+    public void SendMessageVrInteractionIntData(string data, Photon.Realtime.ReceiverGroup group = Photon.Realtime.ReceiverGroup.Others)
     {
         object[] content = new object[] {data }; // Array contains the target position and the IDs of the selected units
         RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = group }; // You would have to set the Receivers to All in order to receive this event on the local client as well
         PhotonNetwork.RaiseEvent((byte)PhotonVrInteraction.EventIDEnum.VrInteractionInt, content, raiseEventOptions, SendOptions.SendReliable);
     }
 
-    public void SendMessageVrInteractionMessageData(int itemGuid, string messageType, string data, ReceiverGroup group = ReceiverGroup.Others)
+    public void SendMessageVrInteractionMessageData(int itemGuid, string messageType, string data, Photon.Realtime.ReceiverGroup group = Photon.Realtime.ReceiverGroup.Others)
     {
         object[] content = new object[] { itemGuid, messageType, data }; // Array contains the target position and the IDs of the selected units
         RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = group }; // You would have to set the Receivers to All in order to receive this event on the local client as well
         PhotonNetwork.RaiseEvent((byte)PhotonVrInteraction.EventIDEnum.VrInteractionMessage, content, raiseEventOptions, SendOptions.SendReliable);
     }
 
-    public void SendMessageGenericHeaderAndData(string subHeader, string data, ReceiverGroup group = ReceiverGroup.Others)
+    public void SendMessageGenericHeaderAndData(string subHeader, string data, Photon.Realtime.ReceiverGroup group = Photon.Realtime.ReceiverGroup.Others)
     {
         object[] content = new object[] { subHeader, data }; // Array contains the target position and the IDs of the selected units
         RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = group }; // You would have to set the Receivers to All in order to receive this event on the local client as well
