@@ -1,0 +1,79 @@
+﻿
+static float TAU = 6.283185307179586476925286766559;
+static float PI = 3.14159265359;
+static float EPSILON = 1e-16;
+
+struct SplSource
+{
+    float3 Position;
+    float4x4 Rotation;
+    float2 Equaliser;
+    int Transducer;
+};
+
+struct SplTransducer
+{
+    float2 Sensitivity;
+};
+
+float2 complex_from_polar_2(float m, float p)
+{
+    return float2(m * cos(p), m * sin(p));
+}
+float2 c_add(float2 lhs, float2 rhs)
+{
+    return float2(lhs.x + rhs.x, lhs.y + rhs.y);
+}
+float2 c_mul(float2 lhs, float2 rhs)
+{
+    return float2(lhs.x * rhs.x - lhs.y * rhs.y, lhs.y * rhs.x + lhs.x * rhs.y);
+}
+float c_abs(float2 c)
+{
+    return sqrt(c.x * c.x + c.y * c.y);
+}
+float2 c_exp_imaginary(float p)
+{
+    return float2(cos(p), sin(p));
+}
+
+float inverse_lerp(float min, float max, float t)
+{
+    return saturate((t - min) / (max - min));
+}
+
+float4 write_colour(float2 c)
+{
+    float m = c_abs(c) + EPSILON;
+    return float4(m, (c.x / m), (c.y / m), 1);
+}
+float2 read_colour(float4 col, float2 sensitivity)
+{
+    float m = col.r - EPSILON;
+    float p = atan2(col.b + EPSILON, col.g);
+
+    m = m * sensitivity.x;
+    p = p + sensitivity.y;
+    
+    return complex_from_polar_2(m, p);
+}
+float2 read_colour(float4 col)
+{
+    return read_colour(col, float2(1, 0));
+}
+
+float decode_float_rg(float2 enc)
+{
+    return dot(enc, float2(1.0, 1.0 / 2048.0));
+}
+float2 decode_colour(float4 c, float maxMag)
+{
+    // (rgb) => (mag + phase)
+    float m = decode_float_rg(c.rg) * maxMag;
+    float pRe = (c.b * 2) - 1;
+    float pIm = (c.a * 2) - 1;
+    float p = atan2(pIm, pRe);
+
+    // (mag + phase) => (real + im)
+    return complex_from_polar_2(m, p);
+}

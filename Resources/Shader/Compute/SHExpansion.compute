@@ -1,0 +1,83 @@
+﻿#pragma kernel compute_balloon
+#pragma kernel squash_balloon
+#pragma kernel clear_output
+
+#include "SplInclude.compute"
+
+#define EXPANSION_THREAD_X 8
+#define EXPANSION_THREAD_Y 8
+#define EXPANSION_THREAD_Z 16
+#define SQUASH_THREAD_X 8
+#define SQUASH_THREAD_Y 8
+#define YYN_MAX 2.204231
+#define YYN_SIZE 4096
+#define YYN_WIDTH 181
+#define YYN_HEIGHT 91
+#define SH_WIDTH 32
+
+//  inputs
+Texture2D<float4> YYnTex;
+Texture2D<float4> SHTex;
+uint SHDepth;
+
+// compute_balloon output
+RWTexture3D<float4> ExpansionTex;
+
+// squash_balloon output
+RWTexture2D<float4> SquashTex;
+
+float4 tex_as_array(Texture2D<float4> t, uint i, uint width)
+{
+    return t[uint2(i % width, i / width)];
+}
+
+float2 get_yyn(uint3 id)
+{
+    uint index = id.x + (YYN_WIDTH * (id.y + YYN_HEIGHT * id.z));
+    float4 col = tex_as_array(YYnTex, index, YYN_SIZE);
+    return decode_colour(col, YYN_MAX);
+}
+
+[numthreads(EXPANSION_THREAD_X, EXPANSION_THREAD_Y, EXPANSION_THREAD_Z)]
+void compute_balloon(uint3 id : SV_DispatchThreadID)
+{
+	// get the spherical harmonic coefficient
+    float4 shCol = tex_as_array(SHTex, id.z, SH_WIDTH);
+    float2 coefficient = read_colour(shCol);
+
+	// get the yyn value
+    float2 yyn = get_yyn(id);
+
+	// multiply the coefficient and yyn
+    float2 c = c_mul(yyn, coefficient);
+	
+	// encode the colour as output
+    ExpansionTex[id.xyz] = write_colour(c);
+}
+
+[numthreads(SQUASH_THREAD_X, SQUASH_THREAD_Y, 1)]
+void squash_balloon(uint3 id : SV_DispatchThreadID)
+{
+	// value for summing
+    float2 c = float2(0, 0);
+
+	// sum up each page
+    for (uint i = 0; i < SHDepth; ++i)
+    {
+        uint3 i3d = uint3(id.xy, i);
+        c = c_add(c, read_colour(ExpansionTex[i3d]));
+    }
+
+	// flip the result vertically
+    id.y = (YYN_HEIGHT - 1) - id.y;
+
+	// encode the colour as output
+    SquashTex[id.xy] = write_colour(c);
+}
+
+[numthreads(EXPANSION_THREAD_X, EXPANSION_THREAD_Y, EXPANSION_THREAD_Z)]
+void clear_output(uint3 id : SV_DispatchThreadID)
+{
+	// clear output
+    ExpansionTex[id.xyz] = float4(0, 0, 0, 0);
+}

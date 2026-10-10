@@ -1,0 +1,41 @@
+﻿#pragma kernel compile_frequencies
+#include "SplInclude.compute"
+#define THREAD_GROUPS 8
+
+// inputs
+Texture3D<float3> Input;
+SamplerState samplerInput;
+float2 InputSize;
+float2 Depth;
+uint SampleSteps;
+
+// output
+RWTexture2D<float4> Output;
+
+float3 read_input(float2 uv, uint i, float increment)
+{
+    float3 uvw = float3(uv, (i * increment) + Depth.x);
+    return Input.SampleLevel(samplerInput, uvw, 0);
+}
+
+[numthreads(THREAD_GROUPS, THREAD_GROUPS, 1)]
+void compile_frequencies(uint3 id : SV_DispatchThreadID)
+{
+    float2 uv = (id.xy) / (InputSize - float2(1, 1));
+    float increment = (Depth.y - Depth.x) / SampleSteps;
+    float step = 1.0 / SampleSteps;
+    float magnitude = 0;
+
+    for (uint i = 0; i < SampleSteps; ++i)
+    {
+        float3 col = read_input(uv, i, increment);
+        float m = col.r - EPSILON;
+        magnitude += (m * m) * step;
+    }
+    magnitude = sqrt(magnitude);
+
+    // db to range
+    float4 output = read_input(uv, SampleSteps * 0.5, increment).xyzx;
+    output.a = 20.0 * log10(max(magnitude, EPSILON));
+    Output[id.xy] = output;
+}
