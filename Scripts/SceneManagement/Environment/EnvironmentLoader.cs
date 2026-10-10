@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR;
 
 public class EnvironmentLoader : MonoBehaviour
 {
@@ -25,6 +26,8 @@ public class EnvironmentLoader : MonoBehaviour
     private bool m_AllowMenu = true;
 
     public void DisableMenu() => m_AllowMenu = false;
+
+    private XRDisplaySubsystem xrDisplay;
 
     // Use this for initialization
     public void Init(List<EnvironmentData> Environments)
@@ -137,7 +140,15 @@ public class EnvironmentLoader : MonoBehaviour
     public void SetInputSystemToVR(bool setToVR)
     {
         Debug.Log($"Set VR system to {setToVR}");
-        UnityEngine.XR.XRSettings.enabled = setToVR;
+        //deprecated UnityEngine.XR.XRSettings.enabled = setToVR;
+        if(setToVR == true)
+        {
+            xrDisplay.Start();
+        }
+        else
+        {
+            xrDisplay.Stop();
+        }
         m_IsSystemVr = setToVR;
         VRInputModule.Instance.SetToVR(setToVR);
     }
