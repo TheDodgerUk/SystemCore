@@ -29,7 +29,7 @@ public class ContentSteamAudioMetaData : MetaData
             new MaterialValue()
         };
 
-    [SerializeField]
+    [System.Serializable]
     public enum MaterialPreset
     {
         Generic,

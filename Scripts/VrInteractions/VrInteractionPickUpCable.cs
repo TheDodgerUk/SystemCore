@@ -57,11 +57,11 @@ public class VrInteractionPickUpCable : VrInteractionPickUpSocket
             }
 #endif
             m_SnapTimer = MAX_SNAP_TIMER;
-            m_MetaData.m_GameObjectPickUpRigidbody.velocity = -m_MetaData.m_GameObjectPickUpRigidbody.velocity * SNAP_POWER;
-            if(Vector3.Magnitude(m_MetaData.m_GameObjectPickUpRigidbody.velocity) < 0.01f)
+            m_MetaData.m_GameObjectPickUpRigidbody.linearVelocity = -m_MetaData.m_GameObjectPickUpRigidbody.linearVelocity * SNAP_POWER;
+            if(Vector3.Magnitude(m_MetaData.m_GameObjectPickUpRigidbody.linearVelocity) < 0.01f)
             {
                 var direction = (m_MetaData.m_GameObjectFixedCableEnd.transform.position - m_MetaData.m_GameObjectPickup.transform.position).normalized;
-                m_MetaData.m_GameObjectPickUpRigidbody.velocity = (direction * 0.1f);
+                m_MetaData.m_GameObjectPickUpRigidbody.linearVelocity = (direction * 0.1f);
             }
         }
         m_SnapTimer -= Time.deltaTime;
