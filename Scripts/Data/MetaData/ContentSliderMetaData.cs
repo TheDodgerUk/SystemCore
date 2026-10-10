@@ -8,7 +8,7 @@ public class ContentSliderMetaData : MetaData
     [System.Serializable]
     public class ItemData : InstructionData
     {
-        [System.Serializable]
+        [SerializeField]
         public enum MoveType
         {
             GameObject,

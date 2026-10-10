@@ -275,7 +275,7 @@ public class AddCatalogueInteractions
             childRB.constraints = RigidbodyConstraints.FreezeRotation;
             childRB.useGravity = false;
             childRB.isKinematic = false;
-            childRB.linearDamping = 100;
+            childRB.drag = 100;
             newList.Add(slider);
         }
 

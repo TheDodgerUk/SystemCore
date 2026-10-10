@@ -51,23 +51,29 @@ public class VrInteractionBaseButton : VrInteraction
     protected float m_AnimationTime;
     private int m_PressedCount = 0;
     public bool AllowPress { get; set; } = true;
+
+    [SerializeField]
     public ButtonStateEnum ButtonState
     {
         get { return m_ButtonState; }
 
         set
         {
-            if (AllowPress == false)
+            if(AllowPress == false)
             {
                 return;
             }
-            if (m_ButtonState != value)
+            if(m_ButtonState != value)
             {
                 ForceButtonState(value);
 #if UNITY_EDITOR
                 m_PressedCount++;
-                if (m_PressedCount > 100)
+                if(m_PressedCount > 100)
                 {
+                    // this is a brutal way to check the the button not going on and off
+                    // i found a button that did this on its own, 
+                    // via bad limits and classing with another button 
+                    // DO NOT REMOVE
                     Debug.Log($"Button pressed a Lot, check if bad button{this.gameObject.GetGameObjectPath()}");
                     m_PressedCount = 0;
                 }

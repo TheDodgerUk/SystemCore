@@ -2,7 +2,7 @@
 using UnityEngine;
 
 
-[System.Serializable]
+[SerializeField]
 public class GameObjectData
 {
     [System.NonSerialized]
@@ -19,13 +19,13 @@ public class GameObjectData
     }
 }
 
-[System.Serializable]
+[SerializeField]
 public class AnimationGameObjectData : GameObjectData
 {
     [SerializeField]
     public string AnimationName;
 }
-[System.Serializable]
+[SerializeField]
 public class RendererGameObjectData : GameObjectData
 {
     [System.NonSerialized]
@@ -41,7 +41,7 @@ public class RendererGameObjectData : GameObjectData
     }
 }
 
-[System.Serializable]
+[SerializeField]
 public class ColliderGameObjectData : GameObjectData
 {
     [System.NonSerialized]

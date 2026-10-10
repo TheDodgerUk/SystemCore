@@ -70,7 +70,7 @@ public class PhotonMultiplayer
         m_PhotonMultiplayerMono.InitialiseForApp();
     }
 
-#if UNITY_ANDROID && VR_INTERACTION
+#if VR_INTERACTION
     private void GetLoggedInUserCallback(Oculus.Platform.Message<User> message)
     {
         if (message.IsError == false)

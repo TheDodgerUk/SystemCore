@@ -158,7 +158,7 @@ namespace Photon.Pun
 
                 if (this.m_SynchronizeVelocity)
                 {
-                    stream.SendNext(this.m_Rigidbody.linearVelocity);
+                    stream.SendNext(this.m_Rigidbody.velocity);
                 }
 
                 if (this.m_SynchronizeAngularVelocity)
@@ -190,9 +190,9 @@ namespace Photon.Pun
 
                     if (this.m_SynchronizeVelocity)
                     {
-                        this.m_Rigidbody.linearVelocity = (Vector3)stream.ReceiveNext();
+                        this.m_Rigidbody.velocity = (Vector3)stream.ReceiveNext();
 
-                        this.m_NetworkPosition += this.m_Rigidbody.linearVelocity * lag;
+                        this.m_NetworkPosition += this.m_Rigidbody.velocity * lag;
 
                         this.m_Distance = Vector3.Distance(this.m_Rigidbody.position, this.m_NetworkPosition);
                     }
