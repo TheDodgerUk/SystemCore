@@ -141,14 +141,27 @@ public class EnvironmentLoader : MonoBehaviour
     {
         Debug.Log($"Set VR system to {setToVR}");
         //deprecated UnityEngine.XR.XRSettings.enabled = setToVR;
-        if(setToVR == true)
+
+        var displays = new List<XRDisplaySubsystem>();
+
+        SubsystemManager.GetSubsystems(displays);
+        if (displays.Count > 0)
         {
-            xrDisplay.Start();
+            xrDisplay = displays[0];
+            if (setToVR == true)
+            {
+                xrDisplay.Start();
+            }
+            else
+            {
+                xrDisplay.Stop();
+            }
         }
         else
         {
-            xrDisplay.Stop();
+            Debug.Log($"Set VR displays was: {displays.Count}");
         }
+
         m_IsSystemVr = setToVR;
         VRInputModule.Instance.SetToVR(setToVR);
     }
