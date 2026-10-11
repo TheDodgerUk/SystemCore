@@ -389,11 +389,13 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
             if (state == true)
             {
 
-                OVRScreenFade.instance.FadeOut(callback);
+                OVRScreenFade.instance.FadeOut();
+                this.WaitFor(1, callback);
             }
             else
             {
-                OVRScreenFade.instance.FadeIn(callback);
+                OVRScreenFade.instance.FadeIn();
+                this.WaitFor(1, callback);
             }
         }
         else

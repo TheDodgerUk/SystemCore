@@ -365,7 +365,7 @@ public class InputManagerVR : MonoSingleton<InputManagerVR>
 #endif
 #if UNITY_ANDROID
             case PlatformType.Quest: return transform.CreateChild<OculusInput>();
-            case PlatformType.VirtualOpenXR: return transform.CreateChild<OpenXRinput>();
+            case PlatformType.VirtualOpenVR: return transform.CreateChild<OpenXRinput>();
 #endif
 #endif
             case PlatformType.Virtual: return transform.CreateChild<VirtualInput>();

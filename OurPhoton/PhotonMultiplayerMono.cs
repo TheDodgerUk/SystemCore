@@ -71,13 +71,13 @@ public class PhotonMultiplayer
     }
 
 #if VR_INTERACTION
-    private void GetLoggedInUserCallback(Oculus.Platform.Message<User> message)
-    {
-        if (message.IsError == false)
-        {
-            PhotonNetwork.LocalPlayer.NickName = string.IsNullOrEmpty(message.Data.DisplayName) ? message.Data.OculusID : message.Data.DisplayName; // oculus user display name}
-        }
-    }
+    ////private void GetLoggedInUserCallback(Oculus.Platform.Message<User> message)
+    ////{
+    ////    if (message.IsError == false)
+    ////    {
+    ////        PhotonNetwork.LocalPlayer.NickName = string.IsNullOrEmpty(message.Data.DisplayName) ? message.Data.OculusID : message.Data.DisplayName; // oculus user display name}
+    ////    }
+    ////}
 #endif
 
     public void Initialise(NetworkType networkType)
@@ -352,19 +352,19 @@ public class PhotonMultiplayerMono : MonoBehaviourPunCallbacks
         var entity = created.GetComponent <SampleAvatarEntity>();
         if (entity != null)
         {
-            if(entity._deferLoading == false)
-            {
-                Debug.LogError("entity._deferLoading must be true");
-            }
+            //if(entity._deferLoading == false)
+            //{
+            //    Debug.LogError("entity._deferLoading must be true");
+            //}
 
-            if (entity._autoCdnRetry == false)
-            {
-                Debug.LogError("entity._autoCdnRetry must be true");
-            }
-            if (entity._autoCheckChanges == false)
-            {
-                Debug.LogError("entity._autoCheckChanges must be true");
-            }
+            //if (entity._autoCdnRetry == false)
+            //{
+            //    Debug.LogError("entity._autoCdnRetry must be true");
+            //}
+            //if (entity._autoCheckChanges == false)
+            //{
+            //    Debug.LogError("entity._autoCheckChanges must be true");
+            //}
 
             if (entity.IsLocal == true)
             {
