@@ -169,14 +169,14 @@ public class Core : MonoBehaviour
         }
 
 #if VR_INTERACTION_AVATAR
-        //if get error here, them OvrAvatarCustomHandPose has been overwritten , fix it 
-        int test = Oculus.Avatar2.OvrAvatarCustomHandPose.JOINT_TRANSFORMS;
+        ////if get error here, them OvrAvatarCustomHandPose has been overwritten , fix it 
+        //int test = Oculus.Avatar2.OvrAvatarCustomHandPose.JOINT_TRANSFORMS;
 
-        // if this breaks, then it means you need to fix the file thats been overwritten
-        var fngerTest = Autohand.HandPoseData.VALID_FINGERS;
+        //// if this breaks, then it means you need to fix the file thats been overwritten
+        //var fngerTest = Autohand.HandPoseData.VALID_FINGERS;
 
-        // if this breaks, then it means you need to fix the file thats been overwritten
-        var otherTest = Oculus.Avatar2.OvrAvatarCustomHandPose.LEFT_SCALE_MAIN;
+        //// if this breaks, then it means you need to fix the file thats been overwritten
+        //var otherTest = Oculus.Avatar2.OvrAvatarCustomHandPose.LEFT_SCALE_MAIN;
 #endif
 
 

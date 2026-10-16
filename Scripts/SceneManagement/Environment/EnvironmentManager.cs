@@ -957,6 +957,7 @@ public class EnvironmentManager /*: MonoBehaviour*/
             case "[Museum]": return ProcessMuseum;
             case "[TimeLine]": return ProcessTimeLine;
 #endif
+            case "[KillTeam]": return ProcessKillTeam;
             case "[VRRecordCamera]": return ProcessVRRecordCamera;
             case "[NetworkSpeedTest]": return ProcessNetworkSpeedTest;
             case "[OscController]": return ProcessOscController;
@@ -1145,6 +1146,25 @@ public class EnvironmentManager /*: MonoBehaviour*/
         }
 #endif
     }
+
+
+    private void ProcessKillTeam(Scene scene, GameObject obj, ChunkType chunkType)
+    {
+#if HouseBuilder
+        string className = EnvironmentEffect.GetObjectName(obj);
+        switch (className)
+        {
+            case "Table":
+                KillTeam.TableControl table = obj.ForceComponent<KillTeam.TableControl>();
+                table.Initialise();
+                break;
+            case "Holder":
+                obj.gameObject.transform.Find("creaturePreabb_Prefab").AddComponent<InitiliseMiniture>();
+                break;
+        }
+#endif
+    }
+
 
     private void ProcessMonitorTrainer(Scene scene, GameObject obj, ChunkType chunkType)
     {

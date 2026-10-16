@@ -77,11 +77,11 @@ public class CameraOverlay : MonoBehaviour
     }
 
 
-    [InspectorButton]
+    [ContextMenu("Blink On")]
     private void BlinkOn() => ToggleBlink(true, null);
 
 
-    [InspectorButton]
+    [ContextMenu("Blink Off")]
     private void BlinkOff() => ToggleBlink(false, null);
 
     private void OnBlinkStep(float t)

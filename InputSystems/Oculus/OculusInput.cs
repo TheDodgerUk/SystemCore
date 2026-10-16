@@ -45,14 +45,15 @@ public class OculusInput : InputSystem
         OVR,
     }
 
-    private ControllerType m_ControllerType = ControllerType.XR;
+    private ControllerType m_ControllerType = ControllerType.OVR;
 
 
 
 #if VR_INTERACTION_AVATAR
     private  string TELEPORTER => "System/AutoHandTeleporterPointer";
     public override string PHOTON_NETWORK_PLAYER => "NetworkPlayer_AutoHand_AVATAR"; 
-    protected override string PLAYER_PREFAB => "System/Player_AutoHand_Avatar_OVR";
+    //protected override string PLAYER_PREFAB => "System/Player_AutoHand_Avatar_OVR";
+    protected override string PLAYER_PREFAB => "System/Player_AutoHand_Gloves_OVR";
 #else
     public override string PHOTON_NETWORK_PLAYER => "NetworkPlayer_AutoHand_Gloves";
     protected override string PLAYER_PREFAB => "System/Player_AutoHand_Gloves_XR";

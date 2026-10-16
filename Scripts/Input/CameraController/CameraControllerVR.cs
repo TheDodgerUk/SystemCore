@@ -232,6 +232,11 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
 
     public void TeleportAvatar(Scene targetScene, Vector3 target, Quaternion rot, Action onFinish)
     {
+        Debug.LogError($"Scene: {targetScene.name}");
+        Debug.LogError($"Valid: {targetScene.IsValid()}");
+        Debug.LogError($"Loaded: {targetScene.isLoaded}");
+        Debug.LogError($"Handle: {targetScene.handle}");
+
         CollectAutohandData();
         Core.PhotonMultiplayerRef.OwnersAvatarSendData(false);
         CameraControllerVR.Instance.ToggleBlink(true, () =>
