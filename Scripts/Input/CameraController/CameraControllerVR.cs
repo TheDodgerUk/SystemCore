@@ -45,6 +45,8 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
 
     private Camera m_MainCamera;
 
+    private Transform m_CentreEyeRoot;
+
     private CameraOverlay m_Overlay;
     // private CameraFade m_Fade;
 
@@ -66,6 +68,16 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
             SetCamera(Camera.main, null);
         }
 
+        m_CentreEyeRoot = this.transform.Find("CenterEyeAnchor");
+        if (m_CentreEyeRoot != null)
+        {
+            m_CentreEyeRoot.gameObject.SetActive(false);
+            Debug.LogError("Turning of CenterEyeAnchor");
+        }
+        else
+        {
+            Debug.LogError("cannot find CenterEyeAnchor");
+        }
     }
 
     public void Initialise()
