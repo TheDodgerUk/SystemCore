@@ -54,6 +54,7 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
     private ControllerSelection m_ControllerSelection;
 
     private bool m_IsFirstTime = true;
+    private PlayerModeSelector playerModeSelector;
 
     protected override void Awake()
     {
@@ -67,8 +68,16 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
         {
             SetCamera(Camera.main, null);
         }
+    }
 
-        m_CentreEyeRoot = this.transform.Find("CenterEyeAnchor");
+    public void Initialise()
+    {
+        Core.Environment.OnPreLoadEnvironment += OnStartEnvironmentChange;
+        playerModeSelector = this.gameObject.AddComponent<PlayerModeSelector>();
+        CollectAutohandData();
+
+
+        m_CentreEyeRoot = m_CameraRigRoot.Find("CenterEyeAnchor");
         if (m_CentreEyeRoot != null)
         {
             m_CentreEyeRoot.gameObject.SetActive(false);
@@ -78,12 +87,9 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
         {
             Debug.LogError("cannot find CenterEyeAnchor");
         }
-    }
 
-    public void Initialise()
-    {
-        Core.Environment.OnPreLoadEnvironment += OnStartEnvironmentChange;
-        CollectAutohandData();
+
+        playerModeSelector.SetupPlayer(m_CentreEyeRoot.gameObject);
     }
 
     private void OnStartEnvironmentChange()
