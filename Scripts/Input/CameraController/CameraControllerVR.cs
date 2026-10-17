@@ -77,7 +77,7 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
         CollectAutohandData();
 
 
-        m_CentreEyeRoot = m_CameraRigRoot.Find("CenterEyeAnchor");
+        m_CentreEyeRoot = m_CameraRigRoot.FindChildRecursive("CenterEyeAnchor");
         if (m_CentreEyeRoot != null)
         {
             m_CentreEyeRoot.gameObject.SetActive(false);
