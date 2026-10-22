@@ -1161,6 +1161,9 @@ public class EnvironmentManager /*: MonoBehaviour*/
             case "Holder":
                 obj.gameObject.transform.Find("creaturePreabb_Prefab").AddComponent<InitiliseMiniture>();
                 break;
+            case "Terrain":
+                obj.gameObject.transform.Find("TestTerrain_Prefab").AddComponent<Terrain>();
+                break;
         }
 #endif
     }
