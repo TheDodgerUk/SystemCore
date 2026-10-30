@@ -250,20 +250,39 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
 
     public void TeleportAvatar(Scene targetScene, Vector3 target, Quaternion rot, Action onFinish)
     {
-        Debug.LogError($"Scene: {targetScene.name}");
-        Debug.LogError($"Valid: {targetScene.IsValid()}");
-        Debug.LogError($"Loaded: {targetScene.isLoaded}");
-        Debug.LogError($"Handle: {targetScene.handle}");
+        string scenePath = targetScene.path;
 
         CollectAutohandData();
         Core.PhotonMultiplayerRef.OwnersAvatarSendData(false);
+
         CameraControllerVR.Instance.ToggleBlink(true, () =>
         {
             SnapTeleport(target, rot);
+
             CameraControllerVR.Instance.ToggleBlink(false, () =>
             {
                 Core.PhotonMultiplayerRef.OwnersAvatarSendData(true);
-                SceneManager.SetActiveScene(targetScene);
+
+                // Get the scene again in case its handle has changed.
+                Scene scene = SceneManager.GetSceneByPath(scenePath);
+
+                Debug.Log($"Scene: {scene.name}");
+                Debug.Log($"Valid: {scene.IsValid()}");
+                Debug.Log($"Loaded: {scene.isLoaded}");
+                Debug.Log($"Handle: {scene.handle}");
+
+                if (scene.IsValid() && scene.isLoaded)
+                {
+                    bool success = SceneManager.SetActiveScene(scene);
+
+                    if (!success)
+                        Debug.LogError($"Failed to set active scene: {scenePath}");
+                }
+                else
+                {
+                    Debug.LogError($"Target scene is not valid or loaded: {scenePath}");
+                }
+
                 onFinish?.Invoke();
                 TeleportFirstTime();
             });

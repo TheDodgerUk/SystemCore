@@ -1161,7 +1161,7 @@ public class EnvironmentManager /*: MonoBehaviour*/
                 obj.gameObject.transform.AddComponent<AssetHolder>();
                 break;
             case "Terrain":
-                obj.gameObject.transform.Find("TestTerrain_Prefab").AddComponent<KillTeam.Terrian>();
+               /// obj.gameObject.transform.Find("TestTerrain_Prefab").AddComponent<KillTeam.Terrian>();
                 break;
         }
 #endif
