@@ -1,64 +1,111 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿
 using System;
-using System.Linq;
+using System.Collections.Generic;
+using UnityEngine;
 
-using System.Diagnostics;
-using System.IO;
-
+[Serializable]
 public class SimpleDictionaryList<TKey, TValue>
 {
-    public class KeyVal<TTKey, TTVal>
+    [Serializable]
+    public class ValueList<T>
     {
-        public TTKey Key { get; set; }
-        public TTVal Value { get; set; }
+        [SerializeField]
+        private List<T> values = new List<T>();
 
-        public KeyVal() { }
-
-        public KeyVal(TTKey key, TTVal val)
+        public List<T> Values
         {
-            this.Key = key;
-            this.Value = val;
+            get => values;
+            set => values = value ?? new List<T>();
+        }
+
+        public ValueList()
+        {
+        }
+
+        public ValueList(List<T> values)
+        {
+            Values = values;
         }
     }
 
-
-
-    List<KeyVal<TKey, List<TValue>>> m_Dictionary = new List<KeyVal<TKey, List<TValue>>>();
-    public SimpleDictionaryList()
+    [Serializable]
+    public class KeyVal<TTKey, TTVal>
     {
-        m_Dictionary.Clear();
+        [SerializeField]
+        private TTKey key;
+
+        [SerializeField]
+        private ValueList<TTVal> value = new ValueList<TTVal>();
+
+        public TTKey Key
+        {
+            get => key;
+            set => key = value;
+        }
+
+        public List<TTVal> Value
+        {
+            get => value.Values;
+            set
+            {
+                if (this.value == null)
+                    this.value = new ValueList<TTVal>();
+
+                this.value.Values = value;
+            }
+        }
+
+        public KeyVal()
+        {
+        }
+
+        public KeyVal(TTKey key, List<TTVal> values)
+        {
+            this.key = key;
+            this.value = new ValueList<TTVal>(values);
+        }
     }
 
-    /// <summary>
-    /// 
-    /// <returns></returns>
+    [SerializeField]
+    private List<KeyVal<TKey, TValue>> m_Dictionary =
+        new List<KeyVal<TKey, TValue>>();
+
+    public SimpleDictionaryList()
+    {
+    }
+
     public List<TValue> GetList(TKey lTKey)
     {
         m_CheckForKey(lTKey);
-        return m_Dictionary.Find(e => e.Key.Equals(lTKey)).Value;
-    }
 
+        return m_Dictionary.Find(
+            e => EqualityComparer<TKey>.Default.Equals(e.Key, lTKey)
+        ).Value;
+    }
 
     public List<TValue> GetListAll()
     {
         List<TValue> returnList = new List<TValue>();
+
         foreach (var item in m_Dictionary)
         {
             returnList.AddRange(item.Value);
         }
+
         return returnList;
     }
 
-
     public TValue GetRandomFromList(TKey lTKey)
     {
-        m_CheckForKey(lTKey);
-        int index = UnityEngine.Random.Range(0, m_Dictionary.Find(e => e.Key.Equals(lTKey)).Value.Count);
-        return m_Dictionary.Find(e => e.Key.Equals(lTKey)).Value[index];
-    }
+        List<TValue> list = GetList(lTKey);
 
+        if (list.Count == 0)
+            return default(TValue);
+
+        int index = UnityEngine.Random.Range(0, list.Count);
+
+        return list[index];
+    }
 
     public List<TKey> GetKeys()
     {
@@ -68,6 +115,7 @@ public class SimpleDictionaryList<TKey, TValue>
         {
             lList.Add(item.Key);
         }
+
         return lList;
     }
 
@@ -81,28 +129,29 @@ public class SimpleDictionaryList<TKey, TValue>
         return m_Dictionary[index].Value;
     }
 
-
     public void GetKey(string lKeyString, ref TKey lTKey)
     {
-        List<TKey> lList = new List<TKey>();
-        foreach (var lKey in lList)
+        foreach (var key in GetKeys())
         {
-            if (lKey.ToString().Contains(lKeyString) == true)
+            if (key != null &&
+                key.ToString().Contains(lKeyString))
             {
-                lTKey = lKey;
+                lTKey = key;
+                return;
             }
         }
     }
 
     public bool KeyExists(TKey lTKey)
     {
-        return m_Dictionary.Find(e => e.Key.Equals(lTKey)) != null;
+        return m_Dictionary.Exists(
+            e => EqualityComparer<TKey>.Default.Equals(e.Key, lTKey)
+        );
     }
 
     public int Count(TKey lKey)
     {
-        m_CheckForKey(lKey);
-        return m_Dictionary.Find(e => e.Key.Equals(lKey)).Value.Count;
+        return GetList(lKey).Count;
     }
 
     public int CountAll()
@@ -113,6 +162,7 @@ public class SimpleDictionaryList<TKey, TValue>
         {
             count += item.Value.Count;
         }
+
         return count;
     }
 
@@ -120,13 +170,17 @@ public class SimpleDictionaryList<TKey, TValue>
     {
         get
         {
-            m_CheckForKey(lTKey);
-            return m_Dictionary.Find(e => e.Key.Equals(lTKey)).Value;
+            return GetList(lTKey);
         }
         set
         {
             m_CheckForKey(lTKey);
-            m_Dictionary.Find(e => e.Key.Equals(lTKey)).Value = value;
+
+            var entry = m_Dictionary.Find(
+                e => EqualityComparer<TKey>.Default.Equals(e.Key, lTKey)
+            );
+
+            entry.Value = value;
         }
     }
 
@@ -134,42 +188,34 @@ public class SimpleDictionaryList<TKey, TValue>
     {
         foreach (var item in m_Dictionary)
         {
-            if (item.Value.Contains(lTValue) == true)
-            {
+            if (item.Value.Contains(lTValue))
                 return item.Key;
-            }
         }
+
         return default(TKey);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public void ClearAll()
     {
-
-        foreach (var item in m_Dictionary)
-        {
-            m_CheckForKey(item.Key);
-            item.Value.Clear();
-        }
         m_Dictionary.Clear();
     }
-    /// <summary>
-    /// 
-    /// <param name="lEDebugType"></param>
+
     public void ClearList(TKey lTKey)
     {
-        m_CheckForKey(lTKey);
-        m_Dictionary.Find(e => e.Key.Equals(lTKey)).Value.Clear();
+        GetList(lTKey).Clear();
     }
 
-    public void GetValue(TKey lTKey, string lName, ref TValue lRefItem)
+    public void GetValue(
+        TKey lTKey,
+        string lName,
+        ref TValue lRefItem)
     {
         List<TValue> lList = GetList(lTKey);
+
         foreach (var lItem in lList)
         {
-            if (lItem.ToString() == lName)
+            if (lItem != null &&
+                lItem.ToString() == lName)
             {
                 lRefItem = lItem;
             }
@@ -184,21 +230,28 @@ public class SimpleDictionaryList<TKey, TValue>
         {
             lList.AddRange(item.Value);
         }
+
         return lList;
     }
 
-
-    public void GetValue(string KeyName, string lName, ref TValue lRefItem)
+    public void GetValue(
+        string KeyName,
+        string lName,
+        ref TValue lRefItem)
     {
         List<TKey> lListKeys = GetKeys();
+
         foreach (var lKey in lListKeys)
         {
-            if (lKey.ToString().Contains(KeyName))
+            if (lKey != null &&
+                lKey.ToString().Contains(KeyName))
             {
                 List<TValue> lValues = GetList(lKey);
+
                 foreach (var lItem in lValues)
                 {
-                    if (lItem.ToString().Contains(lName))
+                    if (lItem != null &&
+                        lItem.ToString().Contains(lName))
                     {
                         lRefItem = lItem;
                     }
@@ -207,7 +260,6 @@ public class SimpleDictionaryList<TKey, TValue>
         }
     }
 
-
     public List<TValue> GetValuesList(TKey lTKey)
     {
         return GetList(lTKey);
@@ -215,8 +267,7 @@ public class SimpleDictionaryList<TKey, TValue>
 
     public void AddToList(TKey lTKey, TValue lTValue)
     {
-        m_CheckForKey(lTKey);
-        m_Dictionary.Find(e => e.Key.Equals(lTKey)).Value.Add(lTValue);
+        GetList(lTKey).Add(lTValue);
     }
 
     public void AddToList(TKey lTKey)
@@ -224,30 +275,30 @@ public class SimpleDictionaryList<TKey, TValue>
         m_CheckForKey(lTKey);
     }
 
-
     public void AddToList(TKey lTKey, List<TValue> lTValue)
     {
-        m_CheckForKey(lTKey);
-        foreach (var item in lTValue)
-        {
-            m_Dictionary.Find(e => e.Key.Equals(lTKey)).Value.Add(item);
-        }
+        if (lTValue == null)
+            return;
+
+        GetList(lTKey).AddRange(lTValue);
     }
 
     public void RemoveFromList(TKey lTKey, TValue lTValue)
     {
-        m_CheckForKey(lTKey);
-        m_Dictionary.Find(e => e.Key.Equals(lTKey)).Value.Remove(lTValue);
+        GetList(lTKey).Remove(lTValue);
     }
 
     private void m_CheckForKey(TKey lTKey)
     {
-        if (m_Dictionary.Count == 0 || m_Dictionary.Find(e => e.Key.Equals(lTKey)) == null)
+        if (!KeyExists(lTKey))
         {
-            KeyVal<TKey, List<TValue>> newitem = new KeyVal<TKey, List<TValue>>(lTKey, new List<TValue>());
-            m_Dictionary.Add(newitem);
+            var newItem =
+                new KeyVal<TKey, TValue>(
+                    lTKey,
+                    new List<TValue>()
+                );
+
+            m_Dictionary.Add(newItem);
         }
     }
-
 }
-
