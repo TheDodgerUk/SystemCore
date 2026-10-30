@@ -1158,7 +1158,7 @@ public class EnvironmentManager /*: MonoBehaviour*/
                 KillTeam.TableControl table = obj.ForceComponent<KillTeam.TableControl>();
                 break;
             case "Holder":
-                obj.gameObject.transform.Find("creaturePreabb_Prefab").AddComponent<InitiliseMiniture>();
+                obj.gameObject.transform.AddComponent<AssetHolder>();
                 break;
             case "Terrain":
                 obj.gameObject.transform.Find("TestTerrain_Prefab").AddComponent<KillTeam.Terrian>();
