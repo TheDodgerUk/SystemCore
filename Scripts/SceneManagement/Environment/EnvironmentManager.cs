@@ -1155,10 +1155,11 @@ public class EnvironmentManager /*: MonoBehaviour*/
         switch (className)
         {
             case "Table":
+                obj.ForceComponent<KillTeamGameManager>();
                 KillTeam.TableControl table = obj.ForceComponent<KillTeam.TableControl>();
                 break;
             case "Holder":
-                obj.gameObject.transform.AddComponent<AssetHolder>();
+                ;
                 break;
             case "Terrain":
                /// obj.gameObject.transform.Find("TestTerrain_Prefab").AddComponent<KillTeam.Terrian>();
