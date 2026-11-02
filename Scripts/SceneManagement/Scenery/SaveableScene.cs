@@ -232,6 +232,14 @@ public class SaveableScene : MonoBehaviour
         m_SpawnedRootVrInteractions.Remove(vr);
     }
 
+    public void RemoveSpawnedVrInteractionAndGameObject(VrInteraction vr)
+    {
+        m_SpawnedRootVrInteractions.RemoveAll(e => e == null);
+        m_SpawnedRootVrInteractions.Remove(vr);
+        Destroy(vr.gameObject);
+    }
+
+
     public List<VrInteraction> GetAllSpawnedVrInteractionScene(string scene)
     {
         m_SpawnedRootVrInteractions.RemoveAll(e => e == null);
