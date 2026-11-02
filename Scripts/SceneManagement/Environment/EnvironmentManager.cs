@@ -1156,6 +1156,7 @@ public class EnvironmentManager /*: MonoBehaviour*/
         {
             case "Table":
                 obj.ForceComponent<KillTeamGameManager>();
+                obj.ForceComponent<BattleStateMachine>();
                 KillTeam.TableControl table = obj.ForceComponent<KillTeam.TableControl>();
                 break;
             case "Holder":
