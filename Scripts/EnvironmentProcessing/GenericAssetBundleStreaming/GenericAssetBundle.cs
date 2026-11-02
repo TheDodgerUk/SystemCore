@@ -129,6 +129,40 @@ public class GenericAssetBundle<T> where T : UnityEngine.Object
         }
     }
 
+    public virtual void AssignGetItem(MonoBehaviour host, string name, T itemToAssign, Action callback)
+    {
+        MonoBehaviour mono = host;
+        if (mono == null)
+        {
+            mono = m_Mono;
+        }
+        if (true == string.IsNullOrEmpty(name))
+        {
+            callback?.Invoke();
+        }
+        else
+        {
+            Core.Assets.LoadAsset<T>(mono, name, AssetBundleLocation, (item) =>
+            {
+                if (item != null)
+                {
+                    if (m_Stored.ContainsKey(name) == false)
+                    {
+                        m_Stored.Add(name, item);
+                    }
+                    ExtraStepsOnCreatedItem(item);
+                    itemToAssign = item;
+                    callback?.Invoke();
+                }
+                else
+                {
+                    callback?.Invoke();
+                }
+            }, 0);
+        }
+    }
+
+
     protected virtual void ExtraStepsOnCreatedItem(T item) { }
 
     public virtual void GetItemList(MonoBehaviour host, Action<List<string>> callbackList)
