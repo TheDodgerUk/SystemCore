@@ -1162,6 +1162,9 @@ public class EnvironmentManager /*: MonoBehaviour*/
             case "BackGroundMusic":
                 obj.ForceComponent<RandomMusicPlaylist>();         
                 break;
+            case "GenericSoundPlayer":
+                obj.ForceComponent<GenericSoundPlayer>();
+                break;
             case "PhysicalButtons":
                 obj.ForceComponent<PhysicalButtons>();
                 break;
