@@ -1159,12 +1159,10 @@ public class EnvironmentManager /*: MonoBehaviour*/
                 obj.ForceComponent<BattleStateMachine>();
                 KillTeam.TableControl table = obj.ForceComponent<KillTeam.TableControl>();
                 break;
-            case "Holder":
-                ;
+            case "BackGroundMusic":
+                obj.ForceComponent<RandomMusicPlaylist>();         
                 break;
-            case "Terrain":
-               /// obj.gameObject.transform.Find("TestTerrain_Prefab").AddComponent<KillTeam.Terrian>();
-                break;
+
         }
 #endif
     }
