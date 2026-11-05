@@ -125,7 +125,7 @@ public static class BoxColliderExtensions
         log.AppendLine("======================================");
 
         if (paddingTooLarge)
-            Debug.LogWarning(log.ToString(), box);
+            Debug.LogError(log.ToString(), box);
         else
             Debug.Log(log.ToString(), box);
 
