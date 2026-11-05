@@ -1155,9 +1155,8 @@ public class EnvironmentManager /*: MonoBehaviour*/
         switch (className)
         {
             case "Table":
-                obj.ForceComponent<KillTeamGameManager>();
-                obj.ForceComponent<BattleStateMachine>();
                 KillTeam.TableControl table = obj.ForceComponent<KillTeam.TableControl>();
+                obj.ForceComponent<Table>();
                 break;
             case "BackGroundMusic":
                 obj.ForceComponent<RandomMusicPlaylist>();         
@@ -1170,6 +1169,10 @@ public class EnvironmentManager /*: MonoBehaviour*/
                 break;
             case "Effects":
                 obj.ForceComponent<EffectsManager>();
+                break;
+            case "Managers":
+                obj.ForceComponent<KillTeamGameManager>();
+                obj.ForceComponent<BattleStateMachine>();
                 break;
 
         }
