@@ -384,6 +384,8 @@ public class Core : MonoBehaviour
             LoadEnvironment();
         });
 
+        var camera = CameraControllerVR.Instance.transform.FindChildRecursive("CenterEyeAnchor").gameObject.GetComponent<Camera>();
+        camera.AddComponent<FixVRStereoCamera>();
     }
 
     private void LoadEnvironment()
