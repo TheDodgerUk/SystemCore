@@ -50,10 +50,12 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
 
     private bool m_IsFirstTime = true;
 
+    public VRControllerSetup vRControllerSetup;
+
     protected override void Awake()
     {
         base.Awake();
-
+        vRControllerSetup = this.AddComponent<VRControllerSetup>();
         m_CameraRigRoot = new GameObject("CameraRigRoot").transform;
         m_CameraRigRoot.SetParent(transform, false);
         m_CameraRigRoot.AddComponent<DebugSafetyVR>();
