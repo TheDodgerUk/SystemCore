@@ -203,7 +203,6 @@ namespace Utils
             {
                 clone.transform.localPosition = original.transform.localPosition;
                 clone.transform.localRotation = original.transform.localRotation;
-                clone.transform.localScale    = original.transform.localScale;
             }
             clone.name = original.name;
             return clone;
@@ -220,7 +219,6 @@ namespace Utils
             {
                 parent.localPosition = original.transform.localPosition;
                 parent.localRotation = original.transform.localRotation;
-                parent.localScale    = original.transform.localScale;
             }
 
             foreach (Transform child in original.transform)

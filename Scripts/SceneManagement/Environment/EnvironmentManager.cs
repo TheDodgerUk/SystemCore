@@ -2,9 +2,6 @@
 #if HouseBuilder
 using HouseBuilder;
 #endif
-#if VR_INTERACTION
-using MonitorTrainer;
-#endif
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -949,15 +946,7 @@ public class EnvironmentManager /*: MonoBehaviour*/
             case CachedObjects.CachedObjectsMono.TAG: return ProcessCachedObjects;
             case "[CatalogueOnly]": return ProcessCatalogueOnly;
             case EnvironmentPosterManager.TAG: return ProcessPosters;
-            case "[HouseBuilder]": return ProcessHouseBuilder;
 
-#if VR_INTERACTION
-            case "[SpaceHulk]" : return ProcessSpaceHulk;
-            case MonitorTrainerConsts.TAG: return ProcessMonitorTrainer;
-            case "[Museum]": return ProcessMuseum;
-            case "[TimeLine]": return ProcessTimeLine;
-#endif
-            case "[KillTeam]": return ProcessKillTeam;
             case "[VRRecordCamera]": return ProcessVRRecordCamera;
             case "[NetworkSpeedTest]": return ProcessNetworkSpeedTest;
             case "[OscController]": return ProcessOscController;
@@ -965,6 +954,7 @@ public class EnvironmentManager /*: MonoBehaviour*/
             case "[WiFiAudioTest]": return ProcessWiFiAudioTest;
             case "[CatalogeOnly]": return null;
             case "[MobileWebAR]": return ProcessMobileWebAR;
+            case "[KillTeam]": return ProcessKillTeam;
             default:
                 Debug.LogError($"Cannot find :{taggedName}");
                 return null;
@@ -994,21 +984,7 @@ public class EnvironmentManager /*: MonoBehaviour*/
         CachedObjects.Instance.AddObjectsToCache(scene, obj.transform, chunkType);
     }
 
-    private void ProcessMuseum(Scene scene, GameObject obj, ChunkType chunkType)
-    {
-#if VR_INTERACTION
-        string className = EnvironmentEffect.GetObjectName(obj);
-        switch (className)
-        {
-            case nameof(Museum.MuseumRoot):
-                Museum.MuseumRoot root = obj.ForceComponent<Museum.MuseumRoot>();
-                root.Initialise();
-                break;
-            default:
-                break;
-        }
-#endif
-    }
+
 
     private void ProcessTimeLine(Scene scene, GameObject obj, ChunkType chunkType)
     {
@@ -1083,195 +1059,6 @@ public class EnvironmentManager /*: MonoBehaviour*/
         }
 #endif
     }
-
-    private void ProcessHouseBuilder(Scene scene, GameObject obj, ChunkType chunkType)
-    {
-#if HouseBuilder
-        string className = EnvironmentEffect.GetObjectName(obj);
-        switch (className)
-        {
-            case nameof(HouseBuilder.HouseBuilderRoot):
-                HouseBuilder.HouseBuilderRoot houseBuilderRef = obj.ForceComponent<HouseBuilder.HouseBuilderRoot>();
-                houseBuilderRef.Initialise();
-                break;
-
-            case "GUIROOT":
-                HouseBuilder.HBGUIManager guiManager = obj.ForceComponent<HouseBuilder.HBGUIManager>();
-                guiManager.Initialise();
-                break;
-
-            case nameof(FloorAndSkyboxManager):
-                FloorAndSkyboxManager interactionFloorRef = obj.ForceComponent<FloorAndSkyboxManager>();
-                break;
-
-            case nameof(HouseBuilder.GuiCentre):
-                HouseBuilder.GuiCentre guiRGuiGenericRef = obj.ForceComponent<HouseBuilder.GuiCentre>();
-                guiRGuiGenericRef.Initialise();
-                break;
-
-            case nameof(HouseBuilder.GuiCentreWorldSpace):
-                HouseBuilder.GuiCentreWorldSpace guiCentreWorldSpace = obj.ForceComponent<HouseBuilder.GuiCentreWorldSpace>();
-                guiCentreWorldSpace.Initialise();
-                break;
-
-            case nameof(HouseViewer.HouseViewerRoot): //This should be in ProcessHouseViewer
-                HouseViewer.HouseViewerRoot houseViewerRef = obj.ForceComponent<HouseViewer.HouseViewerRoot>();
-                houseViewerRef.Initialise();
-                break;
-
-            case nameof(HouseViewer.FileLoaderMenu): //This should be in ProcessHouseViewer
-                HouseViewer.FileLoaderMenu fileLoaderMenu = obj.ForceComponent<HouseViewer.FileLoaderMenu>();
-                fileLoaderMenu.Initialise();
-                break;
-
-            case nameof(HouseViewer.SoundLightMenu): //This should be in ProcessHouseViewer
-                HouseViewer.SoundLightMenu soundLightMenu = obj.ForceComponent<HouseViewer.SoundLightMenu>();
-                soundLightMenu.Initialise();
-                break;
-
-            case nameof(HouseViewer.UserSelectionMenu): //This should be in ProcessHouseViewer
-                HouseViewer.UserSelectionMenu userSelectionMenu = obj.ForceComponent<HouseViewer.UserSelectionMenu>();
-                userSelectionMenu.Initialise();
-                break;
-
-            case nameof(OscController.OscControllerRoot):
-                OscController.OscControllerRoot rootRef = obj.ForceComponent<OscController.OscControllerRoot>();
-                rootRef.Initialise();
-                break;
-
-            case nameof(HouseBuilder.AssetSyncMenu):
-                HouseBuilder.AssetSyncMenu menuRef = obj.ForceComponent<HouseBuilder.AssetSyncMenu>();
-                menuRef.Initialise();
-                break;
-        }
-#endif
-    }
-
-
-    private void ProcessKillTeam(Scene scene, GameObject obj, ChunkType chunkType)
-    {
-#if HouseBuilder
-        string className = EnvironmentEffect.GetObjectName(obj);
-        switch (className)
-        {
-            case "Table":
-                KillTeam.TableControl table = obj.ForceComponent<KillTeam.TableControl>();
-                obj.ForceComponent<Table>();
-                break;
-            case "BackGroundMusic":
-                obj.ForceComponent<RandomMusicPlaylist>();         
-                break;
-            case "GenericSoundPlayer":
-                obj.ForceComponent<GenericSoundPlayer>();
-                break;
-            case "PhysicalButtons":
-                obj.ForceComponent<PhysicalButtons>();
-                break;
-            case "Effects":
-                obj.ForceComponent<EffectsManager>();
-                break;
-            case "Managers":
-                obj.ForceComponent<KillTeamGameManager>();
-                obj.ForceComponent<BattleStateMachine>();
-                break;
-
-        }
-#endif
-    }
-
-
-    private void ProcessMonitorTrainer(Scene scene, GameObject obj, ChunkType chunkType)
-    {
-#if VR_INTERACTION
-        string className = EnvironmentEffect.GetObjectName(obj);
-        switch (className)
-        {
-            case nameof(MonitorTrainer.MonitorTrainerRoot):
-                MonitorTrainer.MonitorTrainerRoot monitorTrainerRootRef = obj.ForceComponent<MonitorTrainer.MonitorTrainerRoot>();
-                monitorTrainerRootRef.Initialise();
-
-                MonitorTrainer.PhysicalAmp physicalAmpRef = obj.ForceComponent<MonitorTrainer.PhysicalAmp>();
-                physicalAmpRef.Initialise();
-                break;
-
-            case nameof(MonitorTrainer.PhysicalConsole):
-                MonitorTrainer.PhysicalConsole physicalConsoleRef = obj.ForceComponent<MonitorTrainer.PhysicalConsole>();
-                physicalConsoleRef.Initialise();
-                break;
-
-            case nameof(MonitorTrainer.OppositeSide):
-                MonitorTrainer.OppositeSide oppositeSide = obj.ForceComponent<MonitorTrainer.OppositeSide>();
-                oppositeSide.Initialise();
-                break;
-
-
-            case nameof(MonitorTrainer.CrowdAndGenericRockSoundManager):
-                MonitorTrainer.CrowdAndGenericRockSoundManager crowdSoundRef = obj.ForceComponent<MonitorTrainer.CrowdAndGenericRockSoundManager>();
-                crowdSoundRef.Initialise();
-                break;
-
-            case nameof(MonitorTrainer.MusicSoundManager):
-                MonitorTrainer.MusicSoundManager musicSoundRef = obj.ForceComponent<MonitorTrainer.MusicSoundManager>();
-                musicSoundRef.Initialise();
-                break;
-
-            case nameof(MonitorTrainer.BalloonManager):
-                MonitorTrainer.BalloonManager balloonRef = obj.ForceComponent<MonitorTrainer.BalloonManager>();
-                balloonRef.Initialise();
-                break;
-
-            case nameof(MonitorTrainer.PhoneManager):
-                MonitorTrainer.PhoneManager phoneRef = obj.ForceComponent<MonitorTrainer.PhoneManager>();
-                phoneRef.Initialise();
-                break;
-
-
-            case nameof(MonitorTrainer.BandManager):
-                MonitorTrainer.BandManager bandManagerRef = obj.ForceComponent<MonitorTrainer.BandManager>();
-                bandManagerRef.Initialise();
-                break;
-
-            case nameof(MonitorTrainer.MenuManager):
-                MonitorTrainer.MenuManager menu = obj.ForceComponent<MonitorTrainer.MenuManager>();
-                menu.Initialise();
-                break;
-
-            default:
-                Debug.LogError($"could not find class {className}");
-                break;
-        }
-#endif
-    }
-
-
-    private void ProcessSpaceHulk(Scene scene, GameObject obj, ChunkType chunkType)
-    {
-#if VR_INTERACTION
-        string className = EnvironmentEffect.GetObjectName(obj);
-        switch (className)
-        {
-            case "SpaceHulkRoot":
-                SpaceHulk.SpaceHulkRoot spaceHulkRoot = obj.ForceComponent<SpaceHulk.SpaceHulkRoot>();
-                spaceHulkRoot.Initialise();
-                break;
-
-            case "Demeo":
-                Demeo.DemeoRoot demeoRoot = obj.ForceComponent<Demeo.DemeoRoot>();
-                demeoRoot.Initialise();
-                break;
-
-            case nameof(MonitorTrainer.PhysicalConsole):
-                MonitorTrainer.PhysicalConsole physicalConsoleRef = obj.ForceComponent<MonitorTrainer.PhysicalConsole>();
-                physicalConsoleRef.Initialise();
-                break;
-
-            default:
-                Debug.LogError($"could not find class {className}");
-                break;
-        }
-#endif
-    }
-
 
 
 
@@ -1352,6 +1139,36 @@ public class EnvironmentManager /*: MonoBehaviour*/
         }
     }
 
+    private void ProcessKillTeam(Scene scene, GameObject obj, ChunkType chunkType)
+    {
+#if HouseBuilder
+        string className = EnvironmentEffect.GetObjectName(obj);
+        switch (className)
+        {
+            case "Table":
+                KillTeam.TableControl table = obj.ForceComponent<KillTeam.TableControl>();
+                obj.ForceComponent<Table>();
+                break;
+            case "BackGroundMusic":
+                obj.ForceComponent<RandomMusicPlaylist>();
+                break;
+            case "GenericSoundPlayer":
+                obj.ForceComponent<GenericSoundPlayer>();
+                break;
+            case "PhysicalButtons":
+                obj.ForceComponent<PhysicalButtons>();
+                break;
+            case "Effects":
+                obj.ForceComponent<EffectsManager>();
+                break;
+            case "Managers":
+                obj.ForceComponent<KillTeamGameManager>();
+                obj.ForceComponent<BattleStateMachine>();
+                break;
+
+        }
+#endif
+    }
 
 
 

@@ -1,6 +1,5 @@
 #if VR_INTERACTION
 using Autohand;
-using MonitorTrainer;
 #endif
 using Photon.Pun;
 using System;
@@ -127,7 +126,7 @@ public class FireExtinguisher : MonoBehaviour
     {
         if (m_IsFiring == true)
         {
-#if Photon && VR_INTERACTION
+#if VR_PHOTON
             var allHits = Physics.RaycastAll(m_HoseEnd.position, m_HoseEnd.forward, 4f, Layers.IgnoreVrInteractionMask);
             foreach (var hit in allHits)
             {

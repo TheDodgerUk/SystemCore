@@ -93,7 +93,7 @@ public static class WaitExtensions
     {
         yield return instruction;
 
-        callback?.Invoke();
+        callback();
     }
 
     private static IEnumerator LoopForHandler(Func<bool> handler, Action onFrame)

@@ -52,8 +52,8 @@ public class OpenXRinput : InputSystem
                 var leftAnchor = CreateRaycastAnchorPoint(leftHandIndex.transform);
                 leftAnchor.transform.localRotation = Quaternion.Euler(0f, -90f, 0f);
                 AddController(new OpenXRControllerData(leftAnchor, leftHandIndex, OVRInput.Controller.LTouch, "Left"));
-                var pokeLeft = leftAnchor.GetComponentInChildren<VRUIPointer>().AddComponent<FingerPokeUICanvas>();
-                pokeLeft.SetIndexPoint(indexL);
+                //var pokeLeft = leftAnchor.GetComponentInChildren<VRUIPointer>().AddComponent<FingerPokeUICanvas>(); HACK
+                //pokeLeft.SetIndexPoint(indexL);
             }
             //////////////////
             {
@@ -69,8 +69,8 @@ public class OpenXRinput : InputSystem
                 rightAnchor.transform.localRotation = Quaternion.Euler(0f, -90f, 0f);
 
                 AddController(new OpenXRControllerData(rightAnchor, rightHandIndex, OVRInput.Controller.RTouch, "Right"));
-                var pokeRight = rightAnchor.GetComponentInChildren<VRUIPointer>().AddComponent<FingerPokeUICanvas>();
-                pokeRight.SetIndexPoint(indexR);
+                //var pokeRight = rightAnchor.GetComponentInChildren<VRUIPointer>().AddComponent<FingerPokeUICanvas>(); HACK
+                //pokeRight.SetIndexPoint(indexR);
             }
 
             Core.Environment.OnEnvironmentLoadingComplete += OnEnvironmentLoading;
@@ -100,7 +100,7 @@ public class OpenXRinput : InputSystem
         {
             item.enabled = true;
         }
-
+ #if VR_PHOTON
         if (CameraControllerVR.Instance.HandLeftRef.follow == null)
         {
             Debug.LogError("CameraControllerVR.Instance.HandLeftRef.follow needs to be set to TrackedPoseDriverLeft");
@@ -116,6 +116,7 @@ public class OpenXRinput : InputSystem
             var input = CameraControllerVR.Instance.GetComponentInChildren<AutoHandTransformTrackingInputManager>(true);
             CameraControllerVR.Instance.HandRightRef.follow = input.rightController;
         }
+#endif
     }
 
     private void RemoveItems(GameObject hand)
@@ -125,7 +126,7 @@ public class OpenXRinput : InputSystem
         {
             Destroy(view);
         }
-
+        #if VR_PHOTON
         var fingers = hand.GetComponentInChildren<NetworkAutoHandFingers>();
         if (fingers != null)
         {
@@ -137,6 +138,7 @@ public class OpenXRinput : InputSystem
         {
             Destroy(photonFingers);
         }
+#endif
     }
 
     private void OnEnvironmentLoading()

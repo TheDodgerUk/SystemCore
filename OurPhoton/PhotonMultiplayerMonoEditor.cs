@@ -4,9 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-#if VR_INTERACTION
-using MonitorTrainer;
-#endif
 
 using UnityEngine.UI;
 using System.IO;

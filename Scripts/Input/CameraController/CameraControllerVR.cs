@@ -29,9 +29,6 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
     public List<Autohand.Hand> HandsRef { get; private set; } = new List<Autohand.Hand>();
 #endif
 
-#if Photon && VR_INTERACTION
-    public Photon.Pun.PhotonAvatarLoading NetworkPlayerRef { get; set; }
-#endif
 
     public float Scale => 1f;
     public ControllerSelection Selection => m_ControllerSelection;
@@ -45,8 +42,6 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
 
     private Camera m_MainCamera;
 
-    private Transform m_CentreEyeRoot;
-
     private CameraOverlay m_Overlay;
     // private CameraFade m_Fade;
 
@@ -54,7 +49,6 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
     private ControllerSelection m_ControllerSelection;
 
     private bool m_IsFirstTime = true;
-    private PlayerModeSelector playerModeSelector;
 
     protected override void Awake()
     {
@@ -68,28 +62,13 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
         {
             SetCamera(Camera.main, null);
         }
+
     }
 
     public void Initialise()
     {
         Core.Environment.OnPreLoadEnvironment += OnStartEnvironmentChange;
-        playerModeSelector = this.gameObject.AddComponent<PlayerModeSelector>();
         CollectAutohandData();
-
-
-        m_CentreEyeRoot = m_CameraRigRoot.FindChildRecursive("CenterEyeAnchor");
-        if (m_CentreEyeRoot != null)
-        {
-            m_CentreEyeRoot.gameObject.SetActive(false);
-            Debug.LogError("Turning of CenterEyeAnchor");
-        }
-        else
-        {
-            Debug.LogError("cannot find CenterEyeAnchor");
-        }
-
-
-        playerModeSelector.SetupPlayer(m_CentreEyeRoot.gameObject);
     }
 
     private void OnStartEnvironmentChange()
@@ -250,39 +229,15 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
 
     public void TeleportAvatar(Scene targetScene, Vector3 target, Quaternion rot, Action onFinish)
     {
-        string scenePath = targetScene.path;
-
         CollectAutohandData();
         Core.PhotonMultiplayerRef.OwnersAvatarSendData(false);
-
         CameraControllerVR.Instance.ToggleBlink(true, () =>
         {
             SnapTeleport(target, rot);
-
             CameraControllerVR.Instance.ToggleBlink(false, () =>
             {
                 Core.PhotonMultiplayerRef.OwnersAvatarSendData(true);
-
-                // Get the scene again in case its handle has changed.
-                Scene scene = SceneManager.GetSceneByPath(scenePath);
-
-                Debug.Log($"Scene: {scene.name}");
-                Debug.Log($"Valid: {scene.IsValid()}");
-                Debug.Log($"Loaded: {scene.isLoaded}");
-                Debug.Log($"Handle: {scene.handle}");
-
-                if (scene.IsValid() && scene.isLoaded)
-                {
-                    bool success = SceneManager.SetActiveScene(scene);
-
-                    if (!success)
-                        Debug.LogError($"Failed to set active scene: {scenePath}");
-                }
-                else
-                {
-                    Debug.LogError($"Target scene is not valid or loaded: {scenePath}");
-                }
-
+                SceneManager.SetActiveScene(targetScene);
                 onFinish?.Invoke();
                 TeleportFirstTime();
             });

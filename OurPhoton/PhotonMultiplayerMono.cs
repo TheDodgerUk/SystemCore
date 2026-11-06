@@ -70,15 +70,7 @@ public class PhotonMultiplayer
         m_PhotonMultiplayerMono.InitialiseForApp();
     }
 
-#if VR_INTERACTION
-    ////private void GetLoggedInUserCallback(Oculus.Platform.Message<User> message)
-    ////{
-    ////    if (message.IsError == false)
-    ////    {
-    ////        PhotonNetwork.LocalPlayer.NickName = string.IsNullOrEmpty(message.Data.DisplayName) ? message.Data.OculusID : message.Data.DisplayName; // oculus user display name}
-    ////    }
-    ////}
-#endif
+
 
     public void Initialise(NetworkType networkType)
     {
@@ -219,7 +211,6 @@ public class PhotonMultiplayerMono : MonoBehaviourPunCallbacks
 
 #if VR_INTERACTION
     private NetworkPlayerGloves m_OwnerNetworkPlayer;
-    private NetworkPlayerAvatar m_OwnerNetworkPlayerAvatar;
 #endif
 
     public PhotonView m_PhotonViewOwner;
@@ -228,7 +219,7 @@ public class PhotonMultiplayerMono : MonoBehaviourPunCallbacks
     public void OwnersAvatarSendData(bool enable)
     {
         bool isDone = false;
-#if VR_INTERACTION
+#if VR_PHOTON
         if (m_OwnerNetworkPlayer != null)
         {
             isDone = true;
@@ -326,7 +317,7 @@ public class PhotonMultiplayerMono : MonoBehaviourPunCallbacks
         }
 
         GameObject created = PhotonNetwork.Instantiate(networkStringType, Vector3.zero, Quaternion.identity, 0);
-#if UNITY_ANDROID && VR_INTERACTION
+#if VR_PHOTON
     
         var fingers = created.GetComponentsInChildren<PhotonTransformFingers>(true);
         if(fingers.Length != 2)
@@ -352,19 +343,19 @@ public class PhotonMultiplayerMono : MonoBehaviourPunCallbacks
         var entity = created.GetComponent <SampleAvatarEntity>();
         if (entity != null)
         {
-            //if(entity._deferLoading == false)
-            //{
-            //    Debug.LogError("entity._deferLoading must be true");
-            //}
+            if(entity._deferLoading == false)
+            {
+                Debug.LogError("entity._deferLoading must be true");
+            }
 
-            //if (entity._autoCdnRetry == false)
-            //{
-            //    Debug.LogError("entity._autoCdnRetry must be true");
-            //}
-            //if (entity._autoCheckChanges == false)
-            //{
-            //    Debug.LogError("entity._autoCheckChanges must be true");
-            //}
+            if (entity._autoCdnRetry == false)
+            {
+                Debug.LogError("entity._autoCdnRetry must be true");
+            }
+            if (entity._autoCheckChanges == false)
+            {
+                Debug.LogError("entity._autoCheckChanges must be true");
+            }
 
             if (entity.IsLocal == true)
             {
@@ -390,7 +381,7 @@ public class PhotonMultiplayerMono : MonoBehaviourPunCallbacks
                 Debug.LogError("view.observableSearch != PhotonView.ObservableSearch.Manual  , must be set to manual");
             }
         }
-
+#if VR_PHOTON
         created.name = $"{networkStringType}: OWNER:{view.Owner.IsMasterClient}, ActorNumber {view.Owner.ActorNumber} ";
         if (view.AmOwner == true)
         {
@@ -411,9 +402,9 @@ public class PhotonMultiplayerMono : MonoBehaviourPunCallbacks
             var head = created.transform.Find("Head");
             VrInteractionFood.AttachFoodCollider(head.gameObject);
         }
+#endif
 
-
-        for(int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
+        for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
         {
             Debug.Log($"OnJoinedRoom PhotonNetwork.PlayerList   {PhotonNetwork.PlayerList[i].UserId}");
             Core.VisualLoggerRef.SetInformation(VisualLogger.InformationType.Avatars, VisualLogger.Information.Information_5, $"PlayerList count {PhotonNetwork.PlayerList.Length}");

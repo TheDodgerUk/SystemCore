@@ -114,12 +114,6 @@ public class AddCatalogueInteractions
                 newList.AddToList(MetaDataType.ContentScript, dials);
                 metaData.AddToList(MetaDataType.ContentScript, newData);
             }
-            else if (itemType == typeof(ContentKillTeamMetaData))
-            {
-                var dials = KillTeamMetaData(objRoot, newData);
-                newList.AddToList(MetaDataType.ContentKillTeam, dials);
-                metaData.AddToList(MetaDataType.ContentKillTeam, newData);
-            }
         }
 
         if(metaData.KeyExists(MetaDataType.ContentPickUp) == true && metaData.KeyExists(MetaDataType.ContentDrink) == true)
@@ -474,16 +468,6 @@ public class AddCatalogueInteractions
         data.CollectAllData(obj);
 
         data.AddItem(obj);     
-        return newList;
-    }
-
-    private List<VrInteraction> KillTeamMetaData(GameObject obj, MetaData newData)
-    {
-        List<VrInteraction> newList = new List<VrInteraction>();
-        ContentKillTeamMetaData data = (ContentKillTeamMetaData)newData;
-        data.CollectAllData(obj);
-
-        //data.AddItem(obj);
         return newList;
     }
 

@@ -22,8 +22,8 @@ public class NetworkPlayerGloves : MonoBehaviour
     [SerializeField]
     private PhotonTransformView m_RemoteRightHand;
 
-    private NetworkAutoHandFingers m_NetworkAutoHandFingersLeft;
-    private NetworkAutoHandFingers m_NetworkAutoHandFingersRight;
+    //////private NetworkAutoHandFingers m_NetworkAutoHandFingersLeft;
+    //////private NetworkAutoHandFingers m_NetworkAutoHandFingersRight;
 
 
     private PhotonView m_PhotonView;
@@ -41,7 +41,7 @@ public class NetworkPlayerGloves : MonoBehaviour
     public bool SHOW_LODS = false;
 #endif
 
-
+#if VR_PHOTON
     void Awake()
     {
         m_PhotonView = GetComponent<PhotonView>();
@@ -120,9 +120,9 @@ public class NetworkPlayerGloves : MonoBehaviour
 
         m_SetupCompleate = true;
     }
-
-    public bool SetUpdateOwnerData(bool enable) => m_UpdateOwnerData = enable; 
-
+#endif
+    public bool SetUpdateOwnerData(bool enable) => m_UpdateOwnerData = enable;
+#if VR_PHOTON
     void Update()
     {
         if (m_SetupCompleate == true)
@@ -151,7 +151,7 @@ public class NetworkPlayerGloves : MonoBehaviour
             }
         }
     }
-
+#endif
 
     private void MapPosition(Transform localTarget, GameObject realObject)
     {
