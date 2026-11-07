@@ -92,6 +92,7 @@ public enum MetaDataType
     ContentHasRigidBody,
     ContentCollision,
     ContentKillTeam,
+    ContentKillTeamAP,
 }
 
 public enum ExternalMetaDataType
