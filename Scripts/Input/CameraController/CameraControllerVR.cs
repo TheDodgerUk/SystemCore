@@ -51,6 +51,7 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
     private bool m_IsFirstTime = true;
 
     public VRControllerSetup vRControllerSetup;
+    private VRCameraOfflineFix vRCameraOfflineFix;
 
     protected override void Awake()
     {
@@ -64,6 +65,8 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
         {
             SetCamera(Camera.main, null);
         }
+
+        vRCameraOfflineFix = this.AddComponent<VRCameraOfflineFix>();
 
     }
 
@@ -287,6 +290,13 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
         AutoHandPlayerRef.SetPosition(pos);
         TeleportingColliders(teleporting: false);
         TeleportFirstTime();
+    }
+
+    public void SetScale(float amount)
+    {
+        Vector3 pos = AutoHandPlayerRef.transform.position;
+        AutoHandPlayerRef.transform.localScale = Vector3.one * amount;
+        SnapTeleport(pos);
     }
 
     public void SnapTeleport(Vector3 pos, Quaternion rot)
