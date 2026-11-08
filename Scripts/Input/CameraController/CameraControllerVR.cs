@@ -7,6 +7,7 @@ using UnityEngine.SpatialTracking;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using Autohand;
 
 public class CameraControllerVR : MonoSingleton<CameraControllerVR>
 {
@@ -25,8 +26,13 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
     public Autohand.AutoHandPlayer AutoHandPlayerRef { get; private set; }
     public Autohand.Hand HandLeftRef { get; private set; }
     public Autohand.Hand HandRightRef { get; private set; }
-
     public List<Autohand.Hand> HandsRef { get; private set; } = new List<Autohand.Hand>();
+
+    public HandGameObjectPointer_OnVrHands HandGameObjectPointerLeftRef { get; private set; }
+    public HandGameObjectPointer_OnVrHands HandGameObjectPointerRightRef { get; private set; }
+
+
+    public List<HandGameObjectPointer_OnVrHands> HandGameObjectPointerRef { get; private set; } = new List<HandGameObjectPointer_OnVrHands>();
 #endif
 
 
@@ -116,6 +122,10 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
             HandsRef = this.GetComponentsInChildren<Autohand.Hand>().ToList();
             HandLeftRef = HandsRef.Find(e => e.left == true);
             HandRightRef = HandsRef.Find(e => e.left == false);
+
+            HandGameObjectPointerLeftRef = HandLeftRef.AddComponent<HandGameObjectPointer_OnVrHands>();
+            HandGameObjectPointerRightRef = HandRightRef.AddComponent<HandGameObjectPointer_OnVrHands>();   
+            HandGameObjectPointerRef = this.GetComponentsInChildren<HandGameObjectPointer_OnVrHands>().ToList();
         }
 #endif
     }
