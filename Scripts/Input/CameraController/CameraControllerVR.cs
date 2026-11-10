@@ -296,10 +296,13 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
 
     public void SnapTeleport(Vector3 pos)
     {
+        var pos1 = AutoHandPlayerRef.GetPosition();
         TeleportingColliders(teleporting: true);
         AutoHandPlayerRef.SetPosition(pos);
         TeleportingColliders(teleporting: false);
         TeleportFirstTime();
+        var pos2 = AutoHandPlayerRef.GetPosition();
+        Debug.Log($"pos1 {pos1}  pos2 {pos2}");
     }
 
     /// <summary>
@@ -346,7 +349,7 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
         AutoHandPlayerRef.SetPosition(pos, rot);
         TeleportingColliders(teleporting: false);
         TeleportFirstTime();
-        Debug.Log($"SnapTeleport after {AutoHandPlayerRef.GetPosition()}")
+        Debug.Log($"SnapTeleport after {AutoHandPlayerRef.GetPosition()}");
     }
 #endif
     #endregion
