@@ -123,8 +123,8 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
             HandLeftRef = HandsRef.Find(e => e.left == true);
             HandRightRef = HandsRef.Find(e => e.left == false);
 
-            HandGameObjectPointerLeftRef = HandLeftRef.AddComponent<HandGameObjectPointer_OnVrHands>();
-            HandGameObjectPointerRightRef = HandRightRef.AddComponent<HandGameObjectPointer_OnVrHands>();   
+            HandGameObjectPointerLeftRef = HandLeftRef.transform.FindChildRecursive("UIPointer").gameObject.AddComponent<HandGameObjectPointer_OnVrHands>();
+            HandGameObjectPointerRightRef = HandRightRef.transform.FindChildRecursive("UIPointer").gameObject.AddComponent<HandGameObjectPointer_OnVrHands>(); 
             HandGameObjectPointerRef = this.GetComponentsInChildren<HandGameObjectPointer_OnVrHands>().ToList();
         }
 #endif
