@@ -302,19 +302,51 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
         TeleportFirstTime();
     }
 
+    /// <summary>
+    /// Scales the AutoHand player while keeping the
+    /// headset at exactly the same world position.
+    /// </summary>
     public void SetScale(float amount)
     {
-        Vector3 pos = AutoHandPlayerRef.transform.position;
-        AutoHandPlayerRef.transform.localScale = Vector3.one * amount;
-        SnapTeleport(pos);
+        if (AutoHandPlayerRef == null || MainCamera == null)
+            return;
+
+        if (amount <= 0f)
+            return;
+
+        // Save the headset's actual world position.
+        Vector3 originalHeadPosition =
+            MainCamera.transform.position;
+
+        // Change the player's scale.
+        AutoHandPlayerRef.transform.localScale =
+            Vector3.one * amount;
+
+        // Calculate how far the headset moved
+        // because of the scale change.
+        Vector3 headOffset =
+            originalHeadPosition -
+            MainCamera.transform.position;
+
+        // Move the AutoHand player by that difference,
+        // keeping the headset in its original location.
+        Vector3 newPlayerPosition =
+            AutoHandPlayerRef.transform.position +
+            headOffset;
+
+        // Use AutoHand's positioning method to keep
+        // its tracking and physics state synchronized.
+        SnapTeleport(newPlayerPosition);
     }
 
     public void SnapTeleport(Vector3 pos, Quaternion rot)
     {
+        Debug.Log($"SnapTeleport before {AutoHandPlayerRef.GetPosition()}");
         TeleportingColliders(teleporting: true);
         AutoHandPlayerRef.SetPosition(pos, rot);
         TeleportingColliders(teleporting: false);
         TeleportFirstTime();
+        Debug.Log($"SnapTeleport after {AutoHandPlayerRef.GetPosition()}")
     }
 #endif
     #endregion
