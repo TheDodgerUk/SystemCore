@@ -308,44 +308,38 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
         Debug.Log($"SnapTeleport maincamera {posHead1}  maincamera {posHead2}");
     }
 
-    /// <summary>
-    /// Scales the AutoHand player while keeping the
-    /// headset at exactly the same world position.
-    /// </summary>
+
+
     public void SetScale(float amount)
     {
-        if (AutoHandPlayerRef == null || MainCamera == null)
+        if (AutoHandPlayerRef == null ||
+            MainCamera == null ||
+            m_CameraRigRoot == null ||
+            amount <= 0f)
             return;
 
-        if (amount <= 0f)
-            return;
-        Debug.Log($"SnapTeleport Before {AutoHandPlayerRef.GetPosition()}  AutoHandPlayer scale :{AutoHandPlayerRef.transform.lossyScale}  MainCamera {MainCamera.transform.position}");
+        // Save original headset world position.
+        Vector3 originalHeadPosition = MainCamera.transform.position;
 
+        Debug.Log(
+            $"BEFORE | Player: {AutoHandPlayerRef.GetPosition()} " +
+            $"Scale: {m_CameraRigRoot.lossyScale} " +
+            $"Head: {originalHeadPosition}");
 
-        // Save the headset's actual world position.
-        Vector3 originalHeadPosition =
-            MainCamera.transform.position;
+        // Scale the complete VR rig, not just AutoHandPlayer.
+        m_CameraRigRoot.localScale = Vector3.one * amount;
 
-        // Change the player's scale.
-        AutoHandPlayerRef.transform.localScale =
-            Vector3.one * amount;
-
-        // Calculate how far the headset moved
-        // because of the scale change.
+        // Calculate the headset's displacement.
         Vector3 headOffset =
-            originalHeadPosition -
-            MainCamera.transform.position;
+            originalHeadPosition - MainCamera.transform.position;
 
-        // Move the AutoHand player by that difference,
-        // keeping the headset in its original location.
-        Vector3 newPlayerPosition =
-            AutoHandPlayerRef.transform.position +
-            headOffset;
+        // Move the entire rig to compensate.
+        m_CameraRigRoot.position += headOffset;
 
-        // Use AutoHand's positioning method to keep
-        // its tracking and physics state synchronized.
-        SnapTeleport(newPlayerPosition);
-        Debug.Log($"SnapTeleport after {AutoHandPlayerRef.GetPosition()}  AutoHandPlayer scale :{AutoHandPlayerRef.transform.lossyScale}  MainCamera {MainCamera.transform.position}");
+        Debug.Log(
+            $"AFTER | Player: {AutoHandPlayerRef.GetPosition()} " +
+            $"Scale: {m_CameraRigRoot.lossyScale} " +
+            $"Head: {MainCamera.transform.position}");
     }
 
     public void SnapTeleport(Vector3 pos, Quaternion rot)
