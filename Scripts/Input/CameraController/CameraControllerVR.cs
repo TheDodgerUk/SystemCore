@@ -13,7 +13,7 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
 {
     public float MinimumCameraDistance { get; private set; }
     public Transform CameraTransform => m_CameraTransform;
-    public Transform RigRoot => m_CameraRigRoot;
+    public Transform RigRoot => m_WholeRootForAvatar;
     public Camera MainCamera { get { return m_MainCamera; } set { m_MainCamera = value; m_CameraTransform = m_MainCamera.transform; } }
 
 #if VR_INTERACTION
@@ -44,7 +44,7 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
 
 
     private Transform m_CameraTransform;
-    private Transform m_CameraRigRoot;
+    private Transform m_WholeRootForAvatar;
 
     private Camera m_MainCamera;
 
@@ -63,9 +63,9 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
     {
         base.Awake();
         vRControllerSetup = this.AddComponent<VRControllerSetup>();
-        m_CameraRigRoot = new GameObject("CameraRigRoot").transform;
-        m_CameraRigRoot.SetParent(transform, false);
-        m_CameraRigRoot.AddComponent<DebugSafetyVR>();
+        m_WholeRootForAvatar = new GameObject("WholeRootForAvatar").transform;
+        m_WholeRootForAvatar.SetParent(transform, false);
+        m_WholeRootForAvatar.AddComponent<DebugSafetyVR>();
 
         if (m_MainCamera == null && Camera.main != null)
         {
@@ -314,7 +314,7 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
     {
         if (AutoHandPlayerRef == null ||
             MainCamera == null ||
-            m_CameraRigRoot == null ||
+            m_WholeRootForAvatar == null ||
             amount <= 0f)
             return;
 
@@ -323,22 +323,22 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
 
         Debug.Log(
             $"BEFORE | Player: {AutoHandPlayerRef.GetPosition()} " +
-            $"Scale: {m_CameraRigRoot.lossyScale} " +
+            $"Scale: {m_WholeRootForAvatar.lossyScale} " +
             $"Head: {originalHeadPosition}");
 
         // Scale the complete VR rig, not just AutoHandPlayer.
-        m_CameraRigRoot.localScale = Vector3.one * amount;
+        m_WholeRootForAvatar.localScale = Vector3.one * amount;
 
         // Calculate the headset's displacement.
         Vector3 headOffset =
             originalHeadPosition - MainCamera.transform.position;
 
         // Move the entire rig to compensate.
-        m_CameraRigRoot.position += headOffset;
+        m_WholeRootForAvatar.position += headOffset;
 
         Debug.Log(
             $"AFTER | Player: {AutoHandPlayerRef.GetPosition()} " +
-            $"Scale: {m_CameraRigRoot.lossyScale} " +
+            $"Scale: {m_WholeRootForAvatar.lossyScale} " +
             $"Head: {MainCamera.transform.position}");
     }
 
@@ -358,12 +358,12 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
         if (rig != null)
         {
             //m_ControllerModes = m_CameraRigRoot.AddComponent<ControllerModes>();
-            m_ControllerSelection = m_CameraRigRoot.AddComponent<ControllerSelection>();
-            m_CameraRigRoot.position = Vector3.zero;
-            m_CameraRigRoot.rotation = Quaternion.identity;
+            m_ControllerSelection = m_WholeRootForAvatar.AddComponent<ControllerSelection>();
+            m_WholeRootForAvatar.position = Vector3.zero;
+            m_WholeRootForAvatar.rotation = Quaternion.identity;
 
             //Set the incoming camera rig to be a child of our rig
-            rig.SetParent(m_CameraRigRoot, false);
+            rig.SetParent(m_WholeRootForAvatar, false);
         }
 
 
@@ -411,13 +411,13 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
 
     public Vector3 GetHeadDisplacement(Vector3 target)
     {
-        float height = m_CameraTransform.position.y - m_CameraRigRoot.position.y;
+        float height = m_CameraTransform.position.y - m_WholeRootForAvatar.position.y;
         var displacement = target - m_CameraTransform.position;
         displacement.y += height;
         return displacement;
     }
 
-    public bool IsInCeiling() => m_CameraRigRoot.position.y > 28f;
+    public bool IsInCeiling() => m_WholeRootForAvatar.position.y > 28f;
 
     public void SetLayerMask(int layerMask)
     {
