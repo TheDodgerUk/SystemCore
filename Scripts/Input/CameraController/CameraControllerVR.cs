@@ -297,12 +297,15 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
     public void SnapTeleport(Vector3 pos)
     {
         var pos1 = AutoHandPlayerRef.GetPosition();
+        var posHead1 = AutoHandPlayerRef.headCamera.transform.position;
         TeleportingColliders(teleporting: true);
         AutoHandPlayerRef.SetPosition(pos);
         TeleportingColliders(teleporting: false);
         TeleportFirstTime();
         var pos2 = AutoHandPlayerRef.GetPosition();
-        Debug.Log($"pos1 {pos1}  pos2 {pos2}");
+        var posHead2 = AutoHandPlayerRef.headCamera.transform.position;
+        Debug.Log($"SnapTeleport  BEfore pos1 {pos1}  After pos2 {pos2}");
+        Debug.Log($"SnapTeleport maincamera {posHead1}  maincamera {posHead2}");
     }
 
     /// <summary>
@@ -316,6 +319,8 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
 
         if (amount <= 0f)
             return;
+        Debug.Log($"SnapTeleport Before {AutoHandPlayerRef.GetPosition()}  AutoHandPlayer scale :{AutoHandPlayerRef.transform.lossyScale}  MainCamera {MainCamera.transform.position}");
+
 
         // Save the headset's actual world position.
         Vector3 originalHeadPosition =
@@ -340,17 +345,15 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
         // Use AutoHand's positioning method to keep
         // its tracking and physics state synchronized.
         SnapTeleport(newPlayerPosition);
+        Debug.Log($"SnapTeleport after {AutoHandPlayerRef.GetPosition()}  AutoHandPlayer scale :{AutoHandPlayerRef.transform.lossyScale}  MainCamera {MainCamera.transform.position}");
     }
 
     public void SnapTeleport(Vector3 pos, Quaternion rot)
     {
-        Debug.Log($"SnapTeleport before {AutoHandPlayerRef.GetPosition()}");
         TeleportingColliders(teleporting: true);
         AutoHandPlayerRef.SetPosition(pos, rot);
         TeleportingColliders(teleporting: false);
-        TeleportFirstTime();
-        Debug.Log($"SnapTeleport after {AutoHandPlayerRef.GetPosition()}");
-    }
+        TeleportFirstTime();    }
 #endif
     #endregion
 

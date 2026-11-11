@@ -26,6 +26,7 @@ public class EnvironmentManager /*: MonoBehaviour*/
     public event Action OnEnvironmentChanged;
 
     public event Action OnEnvironmentLoadingComplete;           // Once all the CurrentEnvironment scenes have been loaded
+    public bool OnEnvironmentLoadingCompleteBool = false;
 
     public event Action OnEnvironmentOptionalLoadingComplete;
 
@@ -350,6 +351,7 @@ public class EnvironmentManager /*: MonoBehaviour*/
                     OVRManager.SetSpaceWarp(true);
                     Debug.LogError($"SetSpaceWarp {OVRManager.GetSpaceWarp()}");
 #endif
+                    OnEnvironmentLoadingCompleteBool = true;
                     OnEnvironmentLoadingComplete?.Invoke();                                    
                 });
 
