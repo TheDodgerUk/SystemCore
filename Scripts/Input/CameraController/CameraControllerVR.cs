@@ -1,55 +1,51 @@
-﻿
-using System;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using Autohand;
 #if VR_INTERACTION
 using UnityEngine.SpatialTracking;
 #endif
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.SceneManagement;
-using Autohand;
 
 public class CameraControllerVR : MonoSingleton<CameraControllerVR>
 {
+    #region Private Fields
+
+    private Dictionary<string, Camera> m_DictOfCreatedCameras = new Dictionary<string, Camera>();
+    private Transform m_CameraTransform;
+    private Transform m_WholeRootForAvatar;
+    private Camera m_MainCamera;
+    private CameraOverlay m_Overlay;
+    private ControllerSelection m_ControllerSelection;
+    private bool m_IsFirstTime = true;
+    private VRCameraOfflineFix vRCameraOfflineFix;
+
+#if VR_INTERACTION
+    private Autohand.HandDistanceGrabber[] m_Grabbers;
+    private Dictionary<Collider, bool> m_OriginalColliderState = new Dictionary<Collider, bool>();
+#endif
+
+    #endregion
+
+    #region Public Fields and Properties
+
     public float MinimumCameraDistance { get; private set; }
     public Transform CameraTransform => m_CameraTransform;
     public Transform RigRoot => m_WholeRootForAvatar;
     public Camera MainCamera { get { return m_MainCamera; } set { m_MainCamera = value; m_CameraTransform = m_MainCamera.transform; } }
-
-#if VR_INTERACTION
-    #region Teleporting
-    public TeleportData TeleporterRight { get; private set; }
-
-    private Autohand.HandDistanceGrabber[] m_Grabbers;
-    #endregion
-
-    public Autohand.AutoHandPlayer AutoHandPlayerRef { get; private set; }
-    public Autohand.Hand HandLeftRef { get; private set; }
-    public Autohand.Hand HandRightRef { get; private set; }
-    public List<Autohand.Hand> HandsRef { get; private set; } = new List<Autohand.Hand>();
-
-#endif
-
-
     public float Scale => 1f;
     public ControllerSelection Selection => m_ControllerSelection;
-    //public ControllerModes ControllerModes => m_ControllerModes;
+    public ExtraControllerInteractions ExtraControllerInteractionsRef;
 
-    private Dictionary<string, Camera> m_DictOfCreatedCameras = new Dictionary<string, Camera>();
+#if VR_INTERACTION
+    public TeleportData TeleporterRight { get; private set; }
+    public Autohand.AutoHandPlayer AutoHandPlayerRef { get; private set; }
+#endif
 
+    #endregion
 
-    private Transform m_CameraTransform;
-    private Transform m_WholeRootForAvatar;
-
-    private Camera m_MainCamera;
-
-    private CameraOverlay m_Overlay;
-    private ControllerSelection m_ControllerSelection;
-
-    private bool m_IsFirstTime = true;
-
-    public VRControllerSetup vRControllerSetup;
-    private VRCameraOfflineFix vRCameraOfflineFix;
+    #region Unity Lifecycle
 
     protected override void Awake()
     {
@@ -67,35 +63,16 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
 
     }
 
+    #endregion
+
+    #region Initialisation
+
     public void Initialise()
     {
         Core.Environment.OnPreLoadEnvironment += OnStartEnvironmentChange;
         CollectAutohandData();
-        vRControllerSetup = this.AddComponent<VRControllerSetup>();
+        ExtraControllerInteractionsRef = this.AddComponent<ExtraControllerInteractions>();
     }
-
-    private void OnStartEnvironmentChange()
-    {
-        foreach (var cam in m_DictOfCreatedCameras.Values)
-        {
-            GameObject.Destroy(cam.gameObject);
-        }
-
-        m_DictOfCreatedCameras.Clear();
-        this.WaitFor(10, () =>
-        {
-            if (m_IsFirstTime == true)
-            {
-                for (int i = 0; i < 10; i++)
-                {
-                    Debug.LogError("Need to teleport before isKinematic = false, its now isKinematic == true");
-                }
-            }
-        });
-    }
-
-
-
 
     public void CollectAutohandData()
     {
@@ -110,160 +87,13 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
             }
             TeleporterRight = new TeleportData(this.gameObject);
 
-
-            HandsRef = this.GetComponentsInChildren<Autohand.Hand>().ToList();
-            HandLeftRef = HandsRef.Find(e => e.left == true);
-            HandRightRef = HandsRef.Find(e => e.left == false);
-
         }
 #endif
     }
 
-#if VR_INTERACTION
-    public bool DistanceGrabHighLightInvalidTarget
-    {
-        get
-        {
-            if (m_Grabbers == null)
-            {
-                m_Grabbers = this.GetComponentsInChildren<Autohand.HandDistanceGrabber>(true);
-            }
-
-            return (m_Grabbers[0].enabled);
-        }
-
-        set
-        {
-            if (m_Grabbers == null)
-            {
-                m_Grabbers = this.GetComponentsInChildren<Autohand.HandDistanceGrabber>(true);
-            }
-            foreach (var item in m_Grabbers)
-            {
-                item.enabled = value;
-            }
-        }
-    }
-
-    public bool DistanceGrabber
-    {
-        get
-        {
-            if (m_Grabbers == null)
-            {
-                m_Grabbers = this.GetComponentsInChildren<Autohand.HandDistanceGrabber>(true);
-            }
-
-            return m_Grabbers[0].isActiveAndEnabled;
-        }
-
-        set
-        {
-            if (m_Grabbers == null)
-            {
-                m_Grabbers = this.GetComponentsInChildren<Autohand.HandDistanceGrabber>(true);
-            }
-            foreach (var item in m_Grabbers)
-            {
-                item.enabled = value;
-            }
-        }
-    }
-
-#endif
-
-    #region teleport
-#if VR_INTERACTION
-    private Dictionary<Collider, bool> m_OriginalColliderState = new Dictionary<Collider, bool>();
-
-    /// <summary>
-    /// when teleporting need to change the colliders on player to trigger
-    /// so they not hit phyisics objects
-    /// 
-    /// and turned back to correct state after
-    /// </summary>
-    /// <param name="teleporting"></param>
-    private void TeleportingColliders(bool teleporting)
-    {
-        if(teleporting == true)
-        {
-            foreach (var item in m_OriginalColliderState)
-            {
-                item.Key.isTrigger = true;
-            }
-        }
-        else
-        {
-            foreach (var item in m_OriginalColliderState)
-            {
-                item.Key.isTrigger = item.Value;
-            }
-        }
-    }
-
-    public void SnapTeleport(Vector3 pos, Scene targetScene)
-    {
-        SnapTeleport(pos);
-        SceneManager.SetActiveScene(targetScene);
-    }
-
-
-    public void SnapTeleport(Vector3 pos)
-    {
-        var pos1 = AutoHandPlayerRef.GetPosition();
-        var posHead1 = AutoHandPlayerRef.headCamera.transform.position;
-        TeleportingColliders(teleporting: true);
-        AutoHandPlayerRef.SetPosition(pos);
-        TeleportingColliders(teleporting: false);
-
-        var pos2 = AutoHandPlayerRef.GetPosition();
-        var posHead2 = AutoHandPlayerRef.headCamera.transform.position;
-        Debug.Log($"SnapTeleport  BEfore pos1 {pos1}  After pos2 {pos2}");
-        Debug.Log($"SnapTeleport maincamera {posHead1}  maincamera {posHead2}");
-    }
-
-
-
-    public void SetScale(float amount)
-    {
-        if (AutoHandPlayerRef == null ||
-            MainCamera == null ||
-            m_WholeRootForAvatar == null ||
-            amount <= 0f)
-            return;
-
-        // Save original headset world position.
-        Vector3 originalHeadPosition = MainCamera.transform.position;
-
-        Debug.Log(
-            $"BEFORE | Player: {AutoHandPlayerRef.GetPosition()} " +
-            $"Scale: {m_WholeRootForAvatar.lossyScale} " +
-            $"Head: {originalHeadPosition}");
-
-        // Scale the complete VR rig, not just AutoHandPlayer.
-        m_WholeRootForAvatar.localScale = Vector3.one * amount;
-
-        // Calculate the headset's displacement.
-        Vector3 headOffset =
-            originalHeadPosition - MainCamera.transform.position;
-
-        // Move the entire rig to compensate.
-        m_WholeRootForAvatar.position += headOffset;
-
-        Debug.Log(
-            $"AFTER | Player: {AutoHandPlayerRef.GetPosition()} " +
-            $"Scale: {m_WholeRootForAvatar.lossyScale} " +
-            $"Head: {MainCamera.transform.position}");
-    }
-
-    public void SnapTeleport(Vector3 pos, Quaternion rot)
-    {
-        TeleportingColliders(teleporting: true);
-        AutoHandPlayerRef.SetPosition(pos, rot);
-        TeleportingColliders(teleporting: false);  
-    }
-#endif
     #endregion
+
+    #region Camera
 
     public void SetCamera(Camera camera, Transform rig)
     {
@@ -322,7 +152,6 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
         //m_Fade.Initialise(m_MainCamera, m_CameraRigRoot, MinimumCameraDistance);
     }
 
-
     public Vector3 GetHeadDisplacement(Vector3 target)
     {
         float height = m_CameraTransform.position.y - m_WholeRootForAvatar.position.y;
@@ -345,10 +174,98 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
         }
     }
 
+    public void SetCameraLoadingSetup(bool bLoading)
+    {
+        if (true == bLoading)
+        {
+            SetLayerMask(Layers.CameraLoadingMask);
+            //m_UiCamera.cullingMask = Layers.LoadingMask;
+        }
+        else
+        {
+            SetLayerMask(Layers.CameraRuntimeMask);
+            // m_UiCamera.cullingMask = Layers.UiMask;
+        }
+    }
+
+    #endregion
+
+    #region Teleporting
+
+#if VR_INTERACTION
+    public void SnapTeleport(Vector3 pos, Scene targetScene)
+    {
+        SnapTeleport(pos);
+        SceneManager.SetActiveScene(targetScene);
+    }
+
+    public void SnapTeleport(Vector3 pos)
+    {
+        var pos1 = AutoHandPlayerRef.GetPosition();
+        var posHead1 = AutoHandPlayerRef.headCamera.transform.position;
+        TeleportingColliders(teleporting: true);
+        AutoHandPlayerRef.SetPosition(pos);
+        TeleportingColliders(teleporting: false);
+
+        var pos2 = AutoHandPlayerRef.GetPosition();
+        var posHead2 = AutoHandPlayerRef.headCamera.transform.position;
+        Debug.Log($"SnapTeleport  BEfore pos1 {pos1}  After pos2 {pos2}");
+        Debug.Log($"SnapTeleport maincamera {posHead1}  maincamera {posHead2}");
+    }
+
+    public void SnapTeleport(Vector3 pos, Quaternion rot)
+    {
+        TeleportingColliders(teleporting: true);
+        AutoHandPlayerRef.SetPosition(pos, rot);
+        TeleportingColliders(teleporting: false);
+    }
+#endif
+
+    #endregion
+
+    #region Scaling
+
+#if VR_INTERACTION
+    public void SetScale(float amount)
+    {
+        if (AutoHandPlayerRef == null ||
+            MainCamera == null ||
+            m_WholeRootForAvatar == null ||
+            amount <= 0f)
+            return;
+
+        // Save original headset world position.
+        Vector3 originalHeadPosition = MainCamera.transform.position;
+
+        Debug.Log(
+            $"BEFORE | Player: {AutoHandPlayerRef.GetPosition()} " +
+            $"Scale: {m_WholeRootForAvatar.lossyScale} " +
+            $"Head: {originalHeadPosition}");
+
+        // Scale the complete VR rig, not just AutoHandPlayer.
+        m_WholeRootForAvatar.localScale = Vector3.one * amount;
+
+        // Calculate the headset's displacement.
+        Vector3 headOffset =
+            originalHeadPosition - MainCamera.transform.position;
+
+        // Move the entire rig to compensate.
+        m_WholeRootForAvatar.position += headOffset;
+
+        Debug.Log(
+            $"AFTER | Player: {AutoHandPlayerRef.GetPosition()} " +
+            $"Scale: {m_WholeRootForAvatar.lossyScale} " +
+            $"Head: {MainCamera.transform.position}");
+    }
+#endif
+
+    #endregion
+
+    #region Blink
+
     public void ToggleBlink(bool state, Action callback = null)
     {
-        DebugBeep.Log("ToggleBlink", DebugBeep.MessageLevel.Low);
-        #if VR_INTERACTION
+#if VR_INTERACTION
         if (OVRScreenFade.instance != null)
         {
             if (state == true)
@@ -377,7 +294,29 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
     public void SetCurrentBlink(BlinkType blinkType) => m_Overlay.SetCurrentBlink(blinkType);
     public void SetBlinkDuration(float duration) => m_Overlay.SetBlinkDuration(duration);
 
+    #endregion
 
+    #region Private Helpers
+
+    private void OnStartEnvironmentChange()
+    {
+        foreach (var cam in m_DictOfCreatedCameras.Values)
+        {
+            GameObject.Destroy(cam.gameObject);
+        }
+
+        m_DictOfCreatedCameras.Clear();
+        this.WaitFor(10, () =>
+        {
+            if (m_IsFirstTime == true)
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    Debug.LogError("Need to teleport before isKinematic = false, its now isKinematic == true");
+                }
+            }
+        });
+    }
 
     private static float GetFurthestCorner(Camera camera)
     {
@@ -393,17 +332,36 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
         return corners.ToList().Maximum(v => v.magnitude);
     }
 
-    public void SetCameraLoadingSetup(bool bLoading)
+    #endregion
+
+    #region Teleport Collider Helpers
+
+#if VR_INTERACTION
+    /// <summary>
+    /// when teleporting need to change the colliders on player to trigger
+    /// so they not hit phyisics objects
+    /// 
+    /// and turned back to correct state after
+    /// </summary>
+    /// <param name="teleporting"></param>
+    private void TeleportingColliders(bool teleporting)
     {
-        if (true == bLoading)
+        if (teleporting == true)
         {
-            SetLayerMask(Layers.CameraLoadingMask);
-            //m_UiCamera.cullingMask = Layers.LoadingMask;
+            foreach (var item in m_OriginalColliderState)
+            {
+                item.Key.isTrigger = true;
+            }
         }
         else
         {
-            SetLayerMask(Layers.CameraRuntimeMask);
-            // m_UiCamera.cullingMask = Layers.UiMask;
+            foreach (var item in m_OriginalColliderState)
+            {
+                item.Key.isTrigger = item.Value;
+            }
         }
     }
+#endif
+
+    #endregion
 }

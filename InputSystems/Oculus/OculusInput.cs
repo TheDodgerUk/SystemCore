@@ -143,15 +143,15 @@ public class OculusInput : InputSystem
                         rightP.transform.localRotation = Quaternion.Euler(0, 180f, 0f);
 
 
-                        CameraControllerVR.Instance.HandLeftRef.palmTransform = leftPalm.transform;
-                        CameraControllerVR.Instance.HandRightRef.palmTransform = rightPalm.transform;
+                        CameraControllerVR.Instance.AutoHandPlayerRef.handLeft.palmTransform = leftPalm.transform;
+                        CameraControllerVR.Instance.AutoHandPlayerRef.handRight.palmTransform = rightPalm.transform;
 
 
-                        AddFingerTipsFor_AVATAR(CameraControllerVR.Instance.HandLeftRef, FingerTipLeft_AVATAR);
-                        AddFingerTipsFor_AVATAR(CameraControllerVR.Instance.HandRightRef, FingerTipRight_AVATAR);
+                        AddFingerTipsFor_AVATAR(CameraControllerVR.Instance.AutoHandPlayerRef.handLeft, FingerTipLeft_AVATAR);
+                        AddFingerTipsFor_AVATAR(CameraControllerVR.Instance.AutoHandPlayerRef.handRight, FingerTipRight_AVATAR);
 
-                        CameraControllerVR.Instance.HandLeftRef.InitilisePalm();
-                        CameraControllerVR.Instance.HandRightRef.InitilisePalm();
+                        CameraControllerVR.Instance.AutoHandPlayerRef.handLeft.InitilisePalm();
+                        CameraControllerVR.Instance.AutoHandPlayerRef.handRight.InitilisePalm();
                     }
                     SafetyChecks();
 
@@ -257,33 +257,33 @@ public class OculusInput : InputSystem
     {
         CameraControllerVR.Instance.CollectAutohandData();
         VrInteractionFood.AttachFoodCollider(Camera.main.gameObject);
-        RemoveItems(CameraControllerVR.Instance.HandLeftRef.gameObject);
-        RemoveItems(CameraControllerVR.Instance.HandRightRef.gameObject);
+        RemoveItems(CameraControllerVR.Instance.AutoHandPlayerRef.handLeft.gameObject);
+        RemoveItems(CameraControllerVR.Instance.AutoHandPlayerRef.handRight.gameObject);
 
-        foreach (var item in CameraControllerVR.Instance.HandLeftRef.fingers)
+        foreach (var item in CameraControllerVR.Instance.AutoHandPlayerRef.handLeft.fingers)
         {
             item.enabled = true;
         }
 
-        foreach (var item in CameraControllerVR.Instance.HandRightRef.fingers)
+        foreach (var item in CameraControllerVR.Instance.AutoHandPlayerRef.handRight.fingers)
         {
             item.enabled = true;
         }
 
-        if(CameraControllerVR.Instance.HandLeftRef.follow == null)
+        if(CameraControllerVR.Instance.AutoHandPlayerRef.handLeft.follow == null)
         {
-            Debug.LogError("CameraControllerVR.Instance.HandLeftRef.follow needs to be set to TrackedPoseDriverLeft");
+            Debug.LogError("CameraControllerVR.Instance.AutoHandPlayerRef.handLeft.follow needs to be set to TrackedPoseDriverLeft");
             Debug.LogError("Setting it vai code");
             var input = CameraControllerVR.Instance.GetComponentInChildren<AutoHandTransformTrackingInputManager>(true);
-            CameraControllerVR.Instance.HandLeftRef.follow = input.leftController;
+            CameraControllerVR.Instance.AutoHandPlayerRef.handLeft.follow = input.leftController;
         }
 
-        if (CameraControllerVR.Instance.HandRightRef.follow == null)
+        if (CameraControllerVR.Instance.AutoHandPlayerRef.handRight.follow == null)
         {
-            Debug.LogError("CameraControllerVR.Instance.HandLeftRef.follow needs to be set to TrackedPoseDriverRight");
+            Debug.LogError("CameraControllerVR.Instance.AutoHandPlayerRef.handLeft.follow needs to be set to TrackedPoseDriverRight");
             Debug.LogError("Setting it vai code");
             var input = CameraControllerVR.Instance.GetComponentInChildren<AutoHandTransformTrackingInputManager>(true);
-            CameraControllerVR.Instance.HandRightRef.follow = input.rightController;
+            CameraControllerVR.Instance.AutoHandPlayerRef.handRight.follow = input.rightController;
         }
     }
 

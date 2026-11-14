@@ -345,8 +345,7 @@ public class EnvironmentManager /*: MonoBehaviour*/
 
                     VRInputModule.Instance.ControlerTypeRef = GlobalConsts.ControllerType.PhysicsHand;
                     InputManagerVR.Instance.ToggleHandRaycastGraphics(Handedness.Left, false);
-                    InputManagerVR.Instance.ToggleHandRaycastGraphics(Handedness.Right, false);
-                    CameraControllerVR.Instance.DistanceGrabHighLightInvalidTarget = false;
+                    InputManagerVR.Instance.ToggleHandRaycastGraphics(Handedness.Right, false); 
 #if UNITY_ANDROID && VR_INTERACTION
                     OVRManager.SetSpaceWarp(true);
                     Debug.LogError($"SetSpaceWarp {OVRManager.GetSpaceWarp()}");

@@ -88,33 +88,33 @@ public class OpenXRinput : InputSystem
     private void SafetyChecks()
     {
         VrInteractionFood.AttachFoodCollider(Camera.main.gameObject);
-        RemoveItems(CameraControllerVR.Instance.HandLeftRef.gameObject);
-        RemoveItems(CameraControllerVR.Instance.HandRightRef.gameObject);
+        RemoveItems(CameraControllerVR.Instance.AutoHandPlayerRef.handLeft.gameObject);
+        RemoveItems(CameraControllerVR.Instance.AutoHandPlayerRef.handRight.gameObject);
 
-        foreach (var item in CameraControllerVR.Instance.HandLeftRef.fingers)
+        foreach (var item in CameraControllerVR.Instance.AutoHandPlayerRef.handLeft.fingers)
         {
             item.enabled = true;
         }
 
-        foreach (var item in CameraControllerVR.Instance.HandRightRef.fingers)
+        foreach (var item in CameraControllerVR.Instance.AutoHandPlayerRef.handRight.fingers)
         {
             item.enabled = true;
         }
  #if VR_PHOTON
-        if (CameraControllerVR.Instance.HandLeftRef.follow == null)
+        if (CameraControllerVR.Instance.AutoHandPlayerRef.handLeft.follow == null)
         {
-            Debug.LogError("CameraControllerVR.Instance.HandLeftRef.follow needs to be set to TrackedPoseDriverLeft");
+            Debug.LogError("CameraControllerVR.Instance.AutoHandPlayerRef.handLeft.follow needs to be set to TrackedPoseDriverLeft");
             Debug.LogError("Setting it vai code");
             var input = CameraControllerVR.Instance.GetComponentInChildren<AutoHandTransformTrackingInputManager>(true);
-            CameraControllerVR.Instance.HandLeftRef.follow = input.leftController;
+            CameraControllerVR.Instance.AutoHandPlayerRef.handLeft.follow = input.leftController;
         }
 
-        if (CameraControllerVR.Instance.HandRightRef.follow == null)
+        if (CameraControllerVR.Instance.AutoHandPlayerRef.handRight.follow == null)
         {
-            Debug.LogError("CameraControllerVR.Instance.HandLeftRef.follow needs to be set to TrackedPoseDriverRight");
+            Debug.LogError("CameraControllerVR.Instance.AutoHandPlayerRef.handLeft.follow needs to be set to TrackedPoseDriverRight");
             Debug.LogError("Setting it vai code");
             var input = CameraControllerVR.Instance.GetComponentInChildren<AutoHandTransformTrackingInputManager>(true);
-            CameraControllerVR.Instance.HandRightRef.follow = input.rightController;
+            CameraControllerVR.Instance.AutoHandPlayerRef.handRight.follow = input.rightController;
         }
 #endif
     }

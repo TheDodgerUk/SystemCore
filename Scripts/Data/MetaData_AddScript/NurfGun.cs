@@ -151,7 +151,7 @@ public class NurfGun : MonoBehaviour
             {
                 AudioSource.PlayClipAtPoint(m_ShootSound, m_GunBarrel.transform.position, m_ShootVolume);
             }
-            var heldItem = CameraControllerVR.Instance.HandsRef.Find(e => e.holdingObj != null);
+            var heldItem = CameraControllerVR.Instance.AutoHandPlayerRef.hands.Find(e => e.holdingObj != null);
             if (heldItem != null)
             {
                 m_Rigidbody.AddForce(m_GunBarrel.transform.up * m_RecoilPower * 5, ForceMode.Impulse);

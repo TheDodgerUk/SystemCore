@@ -63,7 +63,7 @@ public class VrInteractionPickUpSocket : VrInteractionPickUp
                 {
                     m_CheckDistance = false;
 #if VR_INTERACTION
-                    var hand = CameraControllerVR.Instance.HandsRef.Find(e => (e.holdingObj != null) && (e.holdingObj.gameObject == m_MetaData.m_GameObjectPickup));
+                    var hand = CameraControllerVR.Instance.AutoHandPlayerRef.hands.Find(e => (e.holdingObj != null) && (e.holdingObj.gameObject == m_MetaData.m_GameObjectPickup));
                     if (hand != null)
                     {
                         m_MetaData.m_GameObjectPickUpRigidbody.isKinematic = true;

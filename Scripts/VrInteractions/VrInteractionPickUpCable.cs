@@ -48,7 +48,7 @@ public class VrInteractionPickUpCable : VrInteractionPickUpSocket
         {
 #if VR_INTERACTION
             Debug.LogError("ForceReleaseGrab");
-            var hand = CameraControllerVR.Instance.HandsRef.Find(e => e.holdingObj.gameObject == m_MetaData.m_GameObjectPickup);
+            var hand = CameraControllerVR.Instance.AutoHandPlayerRef.hands.Find(e => e.holdingObj.gameObject == m_MetaData.m_GameObjectPickup);
             if (hand != null)
             {
                 // DO not do this, becasause the hand will close and break stuff //hand.OpenHand();

@@ -145,7 +145,7 @@ public class VrInteractionFood : VrInteractionPickUp
         m_CurrentIndex++;
         if (m_Data.m_FoodParts.ContainsIndex(m_CurrentIndex) == false)
         {
-            var hand = CameraControllerVR.Instance.HandsRef.Find(e => e.holdingObj == this);
+            var hand = CameraControllerVR.Instance.AutoHandPlayerRef.hands.Find(e => e.holdingObj == this);
             if (hand != null)
             {
                 hand.ForceReleaseGrab();

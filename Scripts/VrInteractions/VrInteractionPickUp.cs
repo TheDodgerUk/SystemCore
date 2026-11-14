@@ -160,15 +160,15 @@ public class VrInteractionPickUp : VrInteraction
 
 #if Photon && VR_INTERACTION
     [EditorButton]
-    private void DEBUG_GRABBED() => Grabbed(CameraControllerVR.Instance.HandRightRef, null);
+    private void DEBUG_GRABBED() => Grabbed(CameraControllerVR.Instance.AutoHandPlayerRef.handRight, null);
 
     [EditorButton]
-    private void DEBUG_RELEASE() => Release(CameraControllerVR.Instance.HandRightRef, null);
+    private void DEBUG_RELEASE() => Release(CameraControllerVR.Instance.AutoHandPlayerRef.handRight, null);
 
     public void ForceSync() => Release(null, null);    // this is so the sleep can work 
 
-    public void Grab() => Grabbed(CameraControllerVR.Instance.HandRightRef, null);
-    public void Release() => Release(CameraControllerVR.Instance.HandRightRef, null);
+    public void Grab() => Grabbed(CameraControllerVR.Instance.AutoHandPlayerRef.handRight, null);
+    public void Release() => Release(CameraControllerVR.Instance.AutoHandPlayerRef.handRight, null);
 
     private void Grabbed(Hand hand, Grabbable grab)
     {
