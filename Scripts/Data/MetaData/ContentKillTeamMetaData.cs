@@ -115,12 +115,14 @@ public class ContentKillTeamMetaData : MetaData
     }
 
     public OperativeStats m_OperativeStats = new OperativeStats();
-    public List<WeaponStats> weapons = new List<WeaponStats>();
+    public List<WeaponStats> m_Weapons = new List<WeaponStats>();
 
-
+    public List<ContentKillTeamAPMetaData.ApType> m_ApList;
     public ContentKillTeamMetaData()
     {
-
+        m_OperativeStats = new OperativeStats();
+        m_Weapons = new List<WeaponStats>();
+        m_ApList = new List<ContentKillTeamAPMetaData.ApType>();
     }
 
 }
