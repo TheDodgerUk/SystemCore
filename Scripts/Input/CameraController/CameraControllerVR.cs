@@ -54,7 +54,6 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
     protected override void Awake()
     {
         base.Awake();
-        vRControllerSetup = this.AddComponent<VRControllerSetup>();
         m_WholeRootForAvatar = new GameObject("WholeRootForAvatar").transform;
         m_WholeRootForAvatar.SetParent(transform, false);
         m_WholeRootForAvatar.AddComponent<DebugSafetyVR>();
@@ -72,6 +71,7 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
     {
         Core.Environment.OnPreLoadEnvironment += OnStartEnvironmentChange;
         CollectAutohandData();
+        vRControllerSetup = this.AddComponent<VRControllerSetup>();
     }
 
     private void OnStartEnvironmentChange()
