@@ -41,13 +41,13 @@ public class LoadingScreenVR : LoadingScreenBase
         m_Spinner = this.gameObject.SearchComponent<Transform>("PC Camera");
 
 #if VR_INTERACTION
-        CameraControllerVR.Instance.TeleportAvatar(this.gameObject.scene, m_Spinner.transform.position, m_Spinner.transform.rotation, () =>
-        {
+        CameraControllerVR.Instance.SnapTeleport(m_Spinner.transform.position, this.gameObject.scene);
+
             m_Spinner.SetParent(CameraControllerVR.Instance.MainCamera.transform, false);
             m_Spinner.ClearLocals();
             m_Spinner.transform.localPosition = new Vector3(-1, 0, 0); //  this is so it can be seen
             PlaceInfrontMainCamera();
-        });
+
 #endif
 
         var lefthand = InputManagerVR.Instance.GetController(Handedness.Left);

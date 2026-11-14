@@ -28,11 +28,6 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
     public Autohand.Hand HandRightRef { get; private set; }
     public List<Autohand.Hand> HandsRef { get; private set; } = new List<Autohand.Hand>();
 
-    public HandGameObjectPointer_OnVrHands HandGameObjectPointerLeftRef { get; private set; }
-    public HandGameObjectPointer_OnVrHands HandGameObjectPointerRightRef { get; private set; }
-
-
-    public List<HandGameObjectPointer_OnVrHands> HandGameObjectPointerRef { get; private set; } = new List<HandGameObjectPointer_OnVrHands>();
 #endif
 
 
@@ -49,9 +44,6 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
     private Camera m_MainCamera;
 
     private CameraOverlay m_Overlay;
-    // private CameraFade m_Fade;
-
-    //private ControllerModes m_ControllerModes;
     private ControllerSelection m_ControllerSelection;
 
     private bool m_IsFirstTime = true;
@@ -123,9 +115,6 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
             HandLeftRef = HandsRef.Find(e => e.left == true);
             HandRightRef = HandsRef.Find(e => e.left == false);
 
-            HandGameObjectPointerLeftRef = HandLeftRef.transform.FindChildRecursive("UIPointer").gameObject.AddComponent<HandGameObjectPointer_OnVrHands>();
-            HandGameObjectPointerRightRef = HandRightRef.transform.FindChildRecursive("UIPointer").gameObject.AddComponent<HandGameObjectPointer_OnVrHands>(); 
-            HandGameObjectPointerRef = this.GetComponentsInChildren<HandGameObjectPointer_OnVrHands>().ToList();
         }
 #endif
     }
@@ -212,85 +201,10 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
         }
     }
 
-    private void TeleportFirstTime()
+    public void SnapTeleport(Vector3 pos, Scene targetScene)
     {
-        if (Core.Environment.HasOnEnvironmentLoadingComplete == true)
-        {
-            if (m_IsFirstTime == true)
-            {
-                m_IsFirstTime = false;
-                CameraControllerVR.Instance.AutoHandPlayerRef.body.isKinematic = false;
-            }
-        }
-    }
-
-    public void TeleportAvatar(Scene targetScene, Vector3 target, Action onFinish)
-    {
-        CollectAutohandData();
-        Core.PhotonMultiplayerRef.OwnersAvatarSendData(false);
-
-        CameraControllerVR.Instance.ToggleBlink(true, () =>
-        {
-            SnapTeleport(target);
-            CameraControllerVR.Instance.ToggleBlink(false, () =>
-            {
-                Core.PhotonMultiplayerRef.OwnersAvatarSendData(true);
-                SceneManager.SetActiveScene(targetScene);
-                onFinish?.Invoke();
-                TeleportFirstTime();
-            });
-        });
-    }
-
-    public void TeleportAvatar(Scene targetScene, Vector3 target, Quaternion rot, Action onFinish)
-    {
-        CollectAutohandData();
-        Core.PhotonMultiplayerRef.OwnersAvatarSendData(false);
-        CameraControllerVR.Instance.ToggleBlink(true, () =>
-        {
-            SnapTeleport(target, rot);
-            CameraControllerVR.Instance.ToggleBlink(false, () =>
-            {
-                Core.PhotonMultiplayerRef.OwnersAvatarSendData(true);
-                SceneManager.SetActiveScene(targetScene);
-                onFinish?.Invoke();
-                TeleportFirstTime();
-            });
-        });
-    }
-
-    public void TeleportAvatar(Scene targetScene, Transform target, Action onFinish)
-    {
-        CollectAutohandData();
-        Core.PhotonMultiplayerRef.OwnersAvatarSendData(false);
-        CameraControllerVR.Instance.ToggleBlink(true, () =>
-        {
-            SnapTeleport(target.position, target.rotation);
-            CameraControllerVR.Instance.ToggleBlink(false, () =>
-            {
-                Core.PhotonMultiplayerRef.OwnersAvatarSendData(true);
-                SceneManager.SetActiveScene(targetScene);
-                onFinish?.Invoke();
-                TeleportFirstTime();
-            });
-        });
-    }
-
-    public void TeleportAvatar(Scene targetScene, GameObject target, Action onFinish)
-    {
-        CollectAutohandData();
-        Core.PhotonMultiplayerRef.OwnersAvatarSendData(false);
-        CameraControllerVR.Instance.ToggleBlink(true, () =>
-        {
-            SnapTeleport(target.transform.position, target.transform.rotation);
-            CameraControllerVR.Instance.ToggleBlink(false, () =>
-            {
-                Core.PhotonMultiplayerRef.OwnersAvatarSendData(true);
-                SceneManager.SetActiveScene(targetScene);
-                onFinish?.Invoke();
-                TeleportFirstTime();
-            });
-        });
+        SnapTeleport(pos);
+        SceneManager.SetActiveScene(targetScene);
     }
 
 
@@ -301,7 +215,7 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
         TeleportingColliders(teleporting: true);
         AutoHandPlayerRef.SetPosition(pos);
         TeleportingColliders(teleporting: false);
-        TeleportFirstTime();
+
         var pos2 = AutoHandPlayerRef.GetPosition();
         var posHead2 = AutoHandPlayerRef.headCamera.transform.position;
         Debug.Log($"SnapTeleport  BEfore pos1 {pos1}  After pos2 {pos2}");
@@ -346,8 +260,8 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
     {
         TeleportingColliders(teleporting: true);
         AutoHandPlayerRef.SetPosition(pos, rot);
-        TeleportingColliders(teleporting: false);
-        TeleportFirstTime();    }
+        TeleportingColliders(teleporting: false);  
+    }
 #endif
     #endregion
 
