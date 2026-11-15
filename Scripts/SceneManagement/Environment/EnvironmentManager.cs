@@ -1149,6 +1149,7 @@ public class EnvironmentManager /*: MonoBehaviour*/
             case "Table":
                 KillTeam.TableControl table = obj.ForceComponent<KillTeam.TableControl>();
                 obj.ForceComponent<Table>();
+                obj.ForceComponent<GameObjectChildrenPolyCounter>();
                 break;
             case "BackGroundMusic":
                 obj.ForceComponent<RandomMusicPlaylist>();
@@ -1158,9 +1159,11 @@ public class EnvironmentManager /*: MonoBehaviour*/
                 break;
             case "PhysicalButtons":
                 obj.ForceComponent<PhysicalButtons>();
+                obj.ForceComponent<GameObjectChildrenPolyCounter>();
                 break;
             case "Effects":
                 obj.ForceComponent<EffectsManager>();
+                obj.ForceComponent<GameObjectChildrenPolyCounter>();
                 break;
             case "Managers":
                 obj.ForceComponent<KillTeamGameManager>();
