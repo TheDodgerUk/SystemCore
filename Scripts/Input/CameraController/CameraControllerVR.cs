@@ -230,38 +230,7 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
 
     #region Scaling
 
-#if VR_INTERACTION
-    public void SetScale(float amount)
-    {
-        if (AutoHandPlayerRef == null ||
-            m_WholeRootForAvatar == null ||
-            amount <= 0f)
-            return;
 
-        // Save original headset world position.
-        Vector3 originalHeadPosition = AutoHandPlayerRef.transform.position;
-
-        Debug.Log(
-            $"BEFORE | Player: {AutoHandPlayerRef.GetPosition()} " +
-            $"Scale: {m_WholeRootForAvatar.lossyScale} " +
-            $"Head: {originalHeadPosition}");
-
-        // Scale the complete VR rig, not just AutoHandPlayer.
-        m_WholeRootForAvatar.localScale = Vector3.one * amount;
-
-        // Calculate the headset's displacement.
-        Vector3 headOffset =
-            originalHeadPosition - AutoHandPlayerRef.transform.position;
-
-        // Move the entire rig to compensate.
-        m_WholeRootForAvatar.position += headOffset;
-
-        Debug.Log(
-            $"AFTER | Player: {AutoHandPlayerRef.GetPosition()} " +
-            $"Scale: {m_WholeRootForAvatar.lossyScale} " +
-            $"Head: {AutoHandPlayerRef.transform.position}");
-    }
-#endif
 
     #endregion
 
