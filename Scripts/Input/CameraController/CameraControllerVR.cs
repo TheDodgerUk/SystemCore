@@ -22,7 +22,6 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
     private VRCameraOfflineFix vRCameraOfflineFix;
 
 #if VR_INTERACTION
-    private Autohand.HandDistanceGrabber[] m_Grabbers;
     private Dictionary<Collider, bool> m_OriginalColliderState = new Dictionary<Collider, bool>();
 #endif
 
@@ -39,7 +38,6 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
     public ExtraControllerInteractions ExtraControllerInteractionsRef;
 
 #if VR_INTERACTION
-    public TeleportData TeleporterRight { get; private set; }
     public Autohand.AutoHandPlayer AutoHandPlayerRef { get; private set; }
 #endif
 
@@ -85,8 +83,15 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
             {
                 m_OriginalColliderState.Add(item, item.isTrigger);
             }
-            TeleporterRight = new TeleportData(this.gameObject);
 
+
+
+            var toDisable = this.GetComponentsInChildren<Autohand.HandDistanceGrabber>();
+            foreach (var item in toDisable)
+            {
+                item.gameObject.SetActive(false);
+                Debug.Log($"Diabling HandDistanceGrabber");
+            }
         }
 #endif
     }
@@ -229,13 +234,12 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
     public void SetScale(float amount)
     {
         if (AutoHandPlayerRef == null ||
-            MainCamera == null ||
             m_WholeRootForAvatar == null ||
             amount <= 0f)
             return;
 
         // Save original headset world position.
-        Vector3 originalHeadPosition = MainCamera.transform.position;
+        Vector3 originalHeadPosition = AutoHandPlayerRef.transform.position;
 
         Debug.Log(
             $"BEFORE | Player: {AutoHandPlayerRef.GetPosition()} " +
@@ -247,7 +251,7 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
 
         // Calculate the headset's displacement.
         Vector3 headOffset =
-            originalHeadPosition - MainCamera.transform.position;
+            originalHeadPosition - AutoHandPlayerRef.transform.position;
 
         // Move the entire rig to compensate.
         m_WholeRootForAvatar.position += headOffset;
@@ -255,7 +259,7 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
         Debug.Log(
             $"AFTER | Player: {AutoHandPlayerRef.GetPosition()} " +
             $"Scale: {m_WholeRootForAvatar.lossyScale} " +
-            $"Head: {MainCamera.transform.position}");
+            $"Head: {AutoHandPlayerRef.transform.position}");
     }
 #endif
 
