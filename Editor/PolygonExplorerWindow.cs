@@ -506,7 +506,7 @@ public class PolygonExplorerWindow : EditorWindow
                 node.expanded,
                 GUIContent.none,
                 true,
-                GUILayout.Width(15));
+                EditorStyles.foldout);
         }
         else
         {
