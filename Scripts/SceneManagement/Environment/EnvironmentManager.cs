@@ -1166,6 +1166,9 @@ public class EnvironmentManager /*: MonoBehaviour*/
                 obj.ForceComponent<KillTeamGameManager>();
                 obj.ForceComponent<BattleStateMachine>();
                 break;
+            case "Room":
+                obj.ForceComponent<GameObjectChildrenPolyCounter>();
+                break;
 
         }
 #endif
