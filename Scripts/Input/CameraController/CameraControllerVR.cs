@@ -58,6 +58,7 @@ public class CameraControllerVR : MonoSingleton<CameraControllerVR>
         }
 
         vRCameraOfflineFix = this.AddComponent<VRCameraOfflineFix>();
+        this.AddComponent<MeshPolygonCounter>();
 
     }
 
