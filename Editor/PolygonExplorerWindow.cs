@@ -11,7 +11,8 @@
  *
  * INSTALLATION:
  * 1. Save this script as PolygonExplorerWindow.cs.
- * 2. Place it inside Assets/Editor/.
+ * 2. Place it inside an Editor folder
+ *    (e.g. Assets/SystemCore/Editor/).
  * 3. Wait for Unity to compile.
  *
  * HOW TO USE:
@@ -25,7 +26,7 @@
  * OPTIONS:
  * - Inactive      : Include inactive GameObjects.
  * - Selected Only : Scan only selected GameObjects and children.
- * - Sort Largest  : Sort by triangle count, largest first.
+ * - Largest First : Always sort by triangles, largest first.
  * - Treemap       : Show visual polygon usage.
  * - Hierarchy     : Show expandable GameObject hierarchy.
  * - Search        : Filter GameObjects by name.
@@ -53,9 +54,6 @@
  * ============================================================
  */
 
-
-
-
 #if UNITY_EDITOR
 
 using System;
@@ -72,10 +70,12 @@ public class PolygonExplorerWindow : EditorWindow
     {
         public GameObject gameObject;
         public string name;
+
         public readonly List<Node> children = new List<Node>();
 
         public long ownTriangles;
         public long totalTriangles;
+
         public long ownVertices;
         public long totalVertices;
 
@@ -83,14 +83,12 @@ public class PolygonExplorerWindow : EditorWindow
         public int totalMeshCount;
 
         public bool expanded;
-        public Rect treemapRect;
     }
 
     private readonly List<Node> roots = new List<Node>();
     private readonly List<Node> allNodes = new List<Node>();
 
     private Vector2 scrollPosition;
-    private Vector2 treemapScroll;
 
     private long sceneTriangles;
     private long sceneVertices;
@@ -101,7 +99,6 @@ public class PolygonExplorerWindow : EditorWindow
     private bool selectedOnly;
     private bool showTreemap = true;
     private bool showHierarchy = true;
-    private bool sortDescending = true;
 
     private string searchText = "";
 
@@ -111,6 +108,10 @@ public class PolygonExplorerWindow : EditorWindow
 
     private static readonly CultureInfo Culture =
         CultureInfo.GetCultureInfo("en-GB");
+
+    // ============================================================
+    // WINDOW
+    // ============================================================
 
     [MenuItem("Tools/Polygon Explorer")]
     public static void Open()
@@ -129,19 +130,21 @@ public class PolygonExplorerWindow : EditorWindow
             EditorGUILayout.HelpBox(
                 "Press Scan Scene to analyse polygons.",
                 MessageType.Info);
+
             return;
         }
 
-        if (showTreemap)
-            DrawTreemap();
-
+        // Show hierarchy above treemap.
         if (showHierarchy)
             DrawHierarchy();
+
+        if (showTreemap)
+            DrawTreemap();
     }
 
-    // -----------------------------------------
+    // ============================================================
     // TOOLBAR
-    // -----------------------------------------
+    // ============================================================
 
     private void DrawToolbar()
     {
@@ -170,9 +173,9 @@ public class PolygonExplorerWindow : EditorWindow
             EditorStyles.toolbarButton,
             GUILayout.Width(105));
 
-        sortDescending = GUILayout.Toggle(
-            sortDescending,
-            "Sort Largest",
+        // Always largest first. No toggle needed.
+        GUILayout.Label(
+            "Largest First",
             EditorStyles.toolbarButton,
             GUILayout.Width(100));
 
@@ -200,9 +203,9 @@ public class PolygonExplorerWindow : EditorWindow
         EditorGUILayout.EndVertical();
     }
 
-    // -----------------------------------------
+    // ============================================================
     // SCAN
-    // -----------------------------------------
+    // ============================================================
 
     private void ScanScene()
     {
@@ -276,8 +279,14 @@ public class PolygonExplorerWindow : EditorWindow
                 }
             }
 
+            // Calculate totals before sorting.
             CalculateTotals();
+
+            // Sort highest triangle counts first.
             SortNodes(roots);
+
+            // Reset hierarchy scrolling.
+            scrollPosition = Vector2.zero;
 
             Repaint();
         }
@@ -286,6 +295,10 @@ public class PolygonExplorerWindow : EditorWindow
             Debug.LogException(ex);
         }
     }
+
+    // ============================================================
+    // BUILD NODES
+    // ============================================================
 
     private Node BuildNode(GameObject obj)
     {
@@ -338,6 +351,10 @@ public class PolygonExplorerWindow : EditorWindow
         return node;
     }
 
+    // ============================================================
+    // MESH STATISTICS
+    // ============================================================
+
     private void AddMesh(Node node, Mesh mesh)
     {
         node.meshCount++;
@@ -361,9 +378,9 @@ public class PolygonExplorerWindow : EditorWindow
         }
     }
 
-    // -----------------------------------------
+    // ============================================================
     // TOTALS
-    // -----------------------------------------
+    // ============================================================
 
     private void CalculateTotals()
     {
@@ -401,28 +418,35 @@ public class PolygonExplorerWindow : EditorWindow
         }
     }
 
+    // ============================================================
+    // SORTING - LARGEST FIRST
+    // ============================================================
+
     private void SortNodes(List<Node> nodes)
     {
-        if (sortDescending)
+        // Highest total triangle count first.
+        nodes.Sort((a, b) =>
         {
-            nodes.Sort((a, b) =>
-                b.totalTriangles.CompareTo(
-                    a.totalTriangles));
-        }
-        else
-        {
-            nodes.Sort((a, b) =>
-                a.totalTriangles.CompareTo(
-                    b.totalTriangles));
-        }
+            int result =
+                b.totalTriangles.CompareTo(a.totalTriangles);
 
+            // Alphabetical when counts are equal.
+            return result != 0
+                ? result
+                : string.Compare(
+                    a.name,
+                    b.name,
+                    StringComparison.OrdinalIgnoreCase);
+        });
+
+        // Recursively sort every child level.
         foreach (Node node in nodes)
             SortNodes(node.children);
     }
 
-    // -----------------------------------------
+    // ============================================================
     // SUMMARY
-    // -----------------------------------------
+    // ============================================================
 
     private void DrawSummary()
     {
@@ -467,12 +491,13 @@ public class PolygonExplorerWindow : EditorWindow
         EditorGUILayout.EndVertical();
     }
 
-    // -----------------------------------------
+    // ============================================================
     // HIERARCHY
-    // -----------------------------------------
+    // ============================================================
 
     private void DrawHierarchy()
     {
+        // Sorting already occurred during ScanScene.
         EditorGUILayout.Space(10);
 
         EditorGUILayout.LabelField(
@@ -500,19 +525,23 @@ public class PolygonExplorerWindow : EditorWindow
 
         GUILayout.Space(depth * 15f);
 
+        // Fixed-width foldout slot.
+        // Prevents foldouts stretching across the row.
+        Rect foldoutRect = GUILayoutUtility.GetRect(
+            16f,
+            RowHeight,
+            GUILayout.Width(16f));
+
         if (node.children.Count > 0)
         {
-            node.expanded = EditorGUILayout.Foldout(
+            node.expanded = EditorGUI.Foldout(
+                foldoutRect,
                 node.expanded,
                 GUIContent.none,
-                true,
-                EditorStyles.foldout);
-        }
-        else
-        {
-            GUILayout.Space(15);
+                false);
         }
 
+        // Select object by clicking its name.
         if (GUILayout.Button(
             node.name,
             EditorStyles.label,
@@ -526,11 +555,13 @@ public class PolygonExplorerWindow : EditorWindow
                 node.gameObject);
         }
 
+        // Total triangle count.
         GUILayout.Label(
             node.totalTriangles.ToString(
                 "N0", Culture),
             GUILayout.Width(100));
 
+        // Percentage of total scene triangles.
         float percentage = sceneTriangles > 0
             ? (float)node.totalTriangles / sceneTriangles
             : 0f;
@@ -548,12 +579,17 @@ public class PolygonExplorerWindow : EditorWindow
 
         EditorGUILayout.EndHorizontal();
 
+        // Draw children in sorted order.
         if (node.expanded)
         {
             foreach (Node child in node.children)
                 DrawNode(child, depth + 1);
         }
     }
+
+    // ============================================================
+    // SEARCH
+    // ============================================================
 
     private bool MatchesSearch(Node node)
     {
@@ -574,9 +610,9 @@ public class PolygonExplorerWindow : EditorWindow
         return false;
     }
 
-    // -----------------------------------------
+    // ============================================================
     // TREEMAP
-    // -----------------------------------------
+    // ============================================================
 
     private void DrawTreemap()
     {
@@ -687,6 +723,7 @@ public class PolygonExplorerWindow : EditorWindow
                     EditorStyles.whiteMiniLabel);
             }
 
+            // Click a treemap rectangle to select its GameObject.
             if (Event.current.type ==
                 EventType.MouseDown &&
                 childRect.Contains(
